@@ -1,0 +1,6 @@
+.DS_S*
+._*
+*.jpg
+
+dist/
+images/
