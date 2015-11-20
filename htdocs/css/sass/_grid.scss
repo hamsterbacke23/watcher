@@ -1,3 +1,7 @@
 .container {
-  @include container(1024px);
+  @include container(800px);
+}
+
+.grid_12 {
+  @include span(12 of 12);
 }

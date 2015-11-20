@@ -10,3 +10,16 @@ h1,h2,h3,h4,h5,h6 {
   font-family: 'Nunito', sans-serif;
   font-weight: 400;
 }
+
+.container {
+  position: relative;
+}
+
+.enlargeme {
+  display: block;
+  max-width: 100%;
+
+  > .small {
+    max-width: 100%;
+  }
+}
