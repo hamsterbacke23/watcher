@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "still image watcher",
   "main": "htdocs/index.html",
+  "publicPath": "htdocs",
+  "imageoutPathrel": "images/output",
   "dependencies": {
-    "gulp": "^3.9.0"
+    "async": "^1.5.0",
+    "gulp": "^3.9.0",
+    "lwip": "0.0.8"
   },
   "devDependencies": {
     "del": "^2.1.0",

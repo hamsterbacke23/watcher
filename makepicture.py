@@ -2,10 +2,17 @@ import picamera
 import sys
 import time
 from fractions import Fraction
+import os
+import json
+
+currentFilepath = os.path.dirname(os.path.realpath(__file__));
+
+with open(currentFilepath + '/package.json') as data_file:
+   pkgdata = json.load(data_file)
 
 
 # camera = picamera.PiCamera()
-path = 'htdocs/images/output';
+path = currentFilepath + '/' +pkgdata['publicPath'] + '/' +pkgdata['imageoutPathrel'];
 if len(sys.argv) > 1:
     path = sys.argv[1]
 
