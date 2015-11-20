@@ -1,0 +1,12 @@
+html {
+  background-color: #222; // Old browsers
+  color: white;
+  background-repeat: none;
+  background: linear-gradient(to bottom,  #4c4c4c 0%,#222222 300px,#222222 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  min-height: 100%;
+}
+
+h1,h2,h3,h4,h5,h6 {
+  font-family: 'Nunito', sans-serif;
+  font-weight: 400;
+}

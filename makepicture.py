@@ -10,7 +10,7 @@ if len(sys.argv) > 1:
     path = sys.argv[1]
 
 
-now = time.strftime("%m-%d-%Y_%H-%M")
+now = time.strftime("%m-%d-%Y_%H")
 print(now);
 
 
@@ -32,7 +32,7 @@ with picamera.PiCamera() as camera:
     # camera.hflip = True
     # camera.vflip = False
     # camera.crop = (0.0, 0.0, 1.0, 1.0)
-    
+
     camera.resolution = (2592, 1944)
     # camera.framerate = Fraction(1, 6)
     camera.framerate = 2
