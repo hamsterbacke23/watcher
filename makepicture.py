@@ -1,66 +1,76 @@
+#!/usr/bin/python
+
 import picamera
 import sys
 import time
+import datetime
 from fractions import Fraction
 import os
 import json
 
-currentFilepath = os.path.dirname(os.path.realpath(__file__));
+class makePicture:
 
-with open(currentFilepath + '/package.json') as data_file:
-   pkgdata = json.load(data_file)
+  dayStart = 20
+  dayEnd = 14
+
+  # Restricts picture taking to a certain time
+  def checkDayTime(self):
+    timestamp = datetime.datetime.now().time() # Throw away the date information
+    time.sleep(1)
+    dayStartTime = datetime.time(self.dayStart)
+    nightEndTime = datetime.time(23,59)
+    nightStartTime = datetime.time(0)
+    dayEndTime = datetime.time(self.dayEnd)
+
+    if not(dayStartTime <= timestamp <= nightEndTime) and not (nightStartTime <= timestamp <= dayEndTime):
+      return False
+
+    return True
+
+  # Get it on!
+  def __init__(self):
+
+    force = len(sys.argv) > 1 and sys.argv[1] == '-f'
+
+    if not force and not self.checkDayTime():
+      print('Not in time range, exiting')
+      return False
+
+    filePath = self.getFilePath()
+    if (self.takePicture(filePath)):
+      print('Success!')
+
+  def getFilePath(self):
+    currentFilepath = os.path.dirname(os.path.realpath(__file__));
+
+    with open(currentFilepath + '/package.json') as data_file:
+      pkgdata = json.load(data_file)
+
+    # camera = picamera.PiCamera()
+    path = currentFilepath + '/' +pkgdata['publicPath'] + '/' +pkgdata['imageoutPathrel'];
+    if len(sys.argv) > 2:
+        path = sys.argv[2]
+
+    return path
+
+  def takePicture(self, filePath):
+    with picamera.PiCamera() as camera:
+
+      camera.resolution = (2592, 1944)
+      # camera.framerate = Fraction(1, 6)
+      camera.framerate = 2
+      camera.shutter_speed = 800000
+      camera.exposure_mode = 'off'
+      camera.iso = 800
+
+      # Camera warm-up time
+      time.sleep(5)
+
+      now = time.strftime("%m-%d-%Y_%H")
+      camera.capture(filePath + '/image_' + now + '.jpg')
+
+      return True
 
 
-# camera = picamera.PiCamera()
-path = currentFilepath + '/' +pkgdata['publicPath'] + '/' +pkgdata['imageoutPathrel'];
-if len(sys.argv) > 1:
-    path = sys.argv[1]
 
-
-now = time.strftime("%m-%d-%Y_%H")
-print(now);
-
-
-with picamera.PiCamera() as camera:
-    # camera.sharpness = 0
-    # camera.contrast = 0
-    # camera.brightness = 55
-    # camera.saturation = 0
-    # camera.framerate = Fraction(1, 6)
-
-    # camera.video_stabilization = False
-    # camera.exposure_compensation = 0
-    # camera.exposure_mode = 'auto'
-    # camera.meter_mode = 'average'
-    # camera.awb_mode = 'auto'
-    # camera.image_effect = 'none'
-    # camera.color_effects = None
-    # camera.rotation = 0
-    # camera.hflip = True
-    # camera.vflip = False
-    # camera.crop = (0.0, 0.0, 1.0, 1.0)
-
-    camera.resolution = (2592, 1944)
-    # camera.framerate = Fraction(1, 6)
-    camera.framerate = 2
-    camera.shutter_speed = 800000
-    camera.exposure_mode = 'off'
-    camera.iso = 800
-
-
-
-    # Now fix the values
-    # camera.shutter_speed = camera.exposure_speed
-    # g = camera.awb_gains
-    # camera.awb_mode = 'off'
-    # camera.awb_gains = g
-
-
-
-    # camera.start_preview()
-    # Camera warm-up time
-    time.sleep(5)
-
-    camera.capture(path + '/image_' + now + '.jpg')
-
-
+pic = makePicture()
