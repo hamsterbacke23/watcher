@@ -23,7 +23,6 @@ var testPath =  absOutputPath + '/medium';
 //   return (now - image.time) > removeImageTime;
 // }
 
-
 // loop through images and get  iamge data together
 function readImages(dir) {
   var files = fs.readdirSync(dir);
@@ -35,11 +34,7 @@ function readImages(dir) {
     }
   };
 
-  console.log(images);
-  console.log(images.length);
   return images;
-
-
 }
 
 function getData(images) {
@@ -60,9 +55,8 @@ function getData(images) {
     for (var j = 0; j < pjson.resizeSizes.length; j++) {
       sizeKey = pjson.resizeSizes[j].key;
       try {
-        stat = fs.statSync(absOutputPath + '/' + sizeKey + '/' + curImg);
         tmpData[sizeKey] = {};
-        tmpData[sizeKey]['meta'] = stat;
+        tmpData[sizeKey]['time'] = fs.statSync(absOutputPath + '/' + sizeKey + '/' + curImg).mtime.getTime();
         tmpData[sizeKey]['uri'] =  pjson.publicPath + '/' + pjson.imageoutPathrel + '/' + sizeKey + '/' + curImg;
 
       } catch (e) {
@@ -71,6 +65,7 @@ function getData(images) {
     };
 
     if(tmpData) {
+      tmpData.time = tmpData.medium.time;
       imagesData.push(tmpData);
     }
   };
@@ -79,7 +74,6 @@ function getData(images) {
 
 var images = readImages(testPath);
 var imagesData = getData(images);
-console.log(images);
 
 fs.writeFile(__dirname + '/../' + pjson.publicPath + '/data.json', JSON.stringify(imagesData, null, 2) , 'utf-8');
 
