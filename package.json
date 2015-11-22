@@ -3,13 +3,32 @@
   "version": "0.0.1",
   "description": "still image watcher",
   "main": "htdocs/index.html",
-  "publicPath": "htdocs",
+  "publicPath": "/htdocs",
   "imageoutPathrel": "images/output",
   "dependencies": {
     "async": "^1.5.0",
     "gulp": "^3.9.0",
+    "http": "0.0.0",
     "lwip": "0.0.8"
   },
+  "resizeSizes" : [
+    {
+      "key" : "small",
+      "x" : 480,
+      "y" : 320,
+      "removeAfterDays" : 200
+    },
+    {
+      "key" : "medium",
+      "x" : 1024,
+      "y" : 768,
+      "removeAfterDays" : 200
+    },
+    {
+      "key" : "big",
+      "removeAfterDays" : 30
+    }
+  ],
   "devDependencies": {
     "del": "^2.1.0",
     "gulp-autoprefixer": "^3.1.0",

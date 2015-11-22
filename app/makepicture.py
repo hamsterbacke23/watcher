@@ -43,11 +43,11 @@ class makePicture:
   def getFilePath(self):
     currentFilepath = os.path.dirname(os.path.realpath(__file__));
 
-    with open(currentFilepath + '/package.json') as data_file:
+    with open(currentFilepath + '/../package.json') as data_file:
       pkgdata = json.load(data_file)
 
     # camera = picamera.PiCamera()
-    path = currentFilepath + '/' +pkgdata['publicPath'] + '/' +pkgdata['imageoutPathrel'];
+    path = currentFilepath + '/../' +pkgdata['publicPath'] + '/' +pkgdata['imageoutPathrel'] + '/new';
     if len(sys.argv) > 2:
         path = sys.argv[2]
 

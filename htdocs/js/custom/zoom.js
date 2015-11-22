@@ -11,9 +11,10 @@ tsModules.Zoom = (function () {
         var $this = $(this);
         var src = $this.find('img').attr('src');
 
-        var fileName = src.replace(/\.[^/.]+$/, '');
+        var fileName = src.replace('\/medium', '');
+        console.log(fileName);
         $this.zoom({
-          url: fileName + '-big.jpg',
+          url: fileName,
           on : 'grab'
         });
       });
