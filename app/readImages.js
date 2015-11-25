@@ -1,3 +1,4 @@
+
 var pjson = require('../package.json');
 var fs = require('fs');
 var path = require('path');
@@ -57,7 +58,7 @@ function getData(images) {
       try {
         tmpData[sizeKey] = {};
         tmpData[sizeKey]['time'] = fs.statSync(absOutputPath + '/' + sizeKey + '/' + curImg).mtime.getTime();
-        tmpData[sizeKey]['uri'] =  pjson.publicPath + '/' + pjson.imageoutPathrel + '/' + sizeKey + '/' + curImg;
+        tmpData[sizeKey]['uri'] =  '/' + pjson.imageoutPathrel + '/' + sizeKey + '/' + curImg;
 
       } catch (e) {
         continue;

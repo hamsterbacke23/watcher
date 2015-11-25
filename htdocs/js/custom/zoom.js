@@ -9,9 +9,8 @@ tsModules.Zoom = (function () {
       $zoomElements.each(function () {
 
         var $this = $(this);
-        var src = $this.find('img').attr('src');
+        var fileName = $this.find('img.big').attr('src');
 
-        var fileName = src.replace('\/medium', '');
         console.log(fileName);
         $this.zoom({
           url: fileName,

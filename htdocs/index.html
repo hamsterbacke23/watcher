@@ -6,15 +6,50 @@
   <link href='https://fonts.googleapis.com/css?family=Nunito:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="dist/css/main.out.min.css">
   <script src="dist/js/main.js"></script>
+
 </head>
 <body>
   <div class="container">
-    <h1>test</h1>
+    <h1>Live</h1>
     <div class="grid_12">
       <a class="enlargeme">
-        <img class="small" src="images/output/medium/image_11-21-2015_21.jpg" alt="test">
+        <img class="preview" src="" alt="test">
+        <img class="big" src="" alt="test">
       </a>
+      <span class="time"></span>
     </div>
   </div>
+  <script>
+    var timeout;
+
+    function setRefreshTimeout (isVisible) {
+
+      var time = new Date().getTime();
+      $(document.body).bind('mousemove keypress', function(e) {
+          time = new Date().getTime();
+      });
+      console.log('setTimeout', isVisible);
+      if(!isVisible) {
+        window.clearTimeout(timeout);
+        return;
+      }
+
+      function refresh() {
+          if(new Date().getTime() - time >= 15000) {
+              window.location.reload(true);
+          } else {
+            timeout = window.setTimeout(refresh, 5000);
+         }
+      }
+      timeout = window.setTimeout(refresh, 5000);
+    }
+
+    document.addEventListener('webkitvisibilitychange', function(evt) {
+      var isVisible = !this['hidden'];
+      setRefreshTimeout(isVisible);
+    });
+
+    setRefreshTimeout(true);
+  </script>
 </body>
 </html>

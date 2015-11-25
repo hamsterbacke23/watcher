@@ -17,9 +17,20 @@ h1,h2,h3,h4,h5,h6 {
 
 .enlargeme {
   display: block;
-  max-width: 100%;
 
-  > .small {
+  .preview {
     max-width: 100%;
   }
+
+}
+
+img.big {
+  height: 1px;
+  overflow: hidden;
+  display: inline-block;
+}
+
+
+span.time {
+  float: right;
 }
