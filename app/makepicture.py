@@ -10,7 +10,7 @@ import json
 
 class makePicture:
 
-  dayStart = 20
+  dayStart = 21
   dayEnd = 14
 
   # Restricts picture taking to a certain time
@@ -34,20 +34,24 @@ class makePicture:
 
     if not force and not self.checkDayTime():
       print('Not in time range, exiting')
-      return False
+      return
+
+    self.setPackageData();
 
     filePath = self.getFilePath()
     if (self.takePicture(filePath)):
       print('Success!')
 
-  def getFilePath(self):
-    currentFilepath = os.path.dirname(os.path.realpath(__file__));
+  def setPackageData(self):
+    self.currentFilepath = os.path.dirname(os.path.realpath(__file__));
 
-    with open(currentFilepath + '/../package.json') as data_file:
-      pkgdata = json.load(data_file)
+    with open(self.currentFilepath + '/../package.json') as data_file:
+      self.pkgdata = json.load(data_file)
+
+  def getFilePath(self):
 
     # camera = picamera.PiCamera()
-    path = currentFilepath + '/../' +pkgdata['publicPath'] + '/' +pkgdata['imageoutPathrel'] + '/new';
+    path = self.currentFilepath + '/..' + self.pkgdata['publicPath'] + '/' + self.pkgdata['imageoutPathrel'] + '/new';
     if len(sys.argv) > 2:
         path = sys.argv[2]
 
@@ -55,8 +59,13 @@ class makePicture:
 
   def takePicture(self, filePath):
     with picamera.PiCamera() as camera:
+      sizes = self.pkgdata['resizeSizes']
+      for val in sizes:
+        if(val['key'] == 'big'):
+          sizeX = val['x'];
+          sizeY = val['y'];
 
-      camera.resolution = (2592, 1944)
+      camera.resolution = (sizeX, sizeY)
       # camera.framerate = Fraction(1, 6)
       # camera.framerate = 2
       # camera.shutter_speed = 800000

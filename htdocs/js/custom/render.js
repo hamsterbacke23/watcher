@@ -16,7 +16,7 @@ tsModules.Render = (function () {
           tsModules.Zoom.init();
 
           // get time
-          var date = new Date(latest.medium.time);
+          var date = new Date(latest.time);
           var hours = date.getHours();
           var minutes = "0" + date.getMinutes();
           var seconds = "0" + date.getSeconds();

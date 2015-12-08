@@ -1,0 +1,65 @@
+$gaugeWidth: 120px;
+
+.gauge {
+  float: left;
+  margin-right: 20px;
+  position: relative;
+  width: $gaugeWidth;
+  height: $gaugeWidth;
+  overflow: hidden;
+
+  > .meter,
+  &::before {
+    content: " ";
+    display: block;
+    width: $gaugeWidth * 2;
+    height: $gaugeWidth * 2;
+    background-color: $gray;
+    border-radius: 100%;
+    position: absolute;
+    left: -100%;
+    top: 0;
+  }
+
+  > .meter {
+    background-color: $turquoise;
+    border-radius: $gaugeWidth $gaugeWidth 0 0;
+    height: 100%;
+    transform: rotate(180deg);
+    transform-origin: 50% 100%;
+  }
+}
+
+.gaugewrapper {
+  position: relative;
+
+  .meta {
+    position: absolute;
+    bottom: -40px;
+    left: $gaugeWidth + 10px;
+    font-family: Avenir;
+    font-weight: 600;
+    font-size: 60px;
+    color: $almostWhite;
+    float: left;
+
+    &::after {
+      content: "";
+      font-size: 25px;
+      color: $darkgray;
+      margin-left: 2px;
+      padding-top: 35px;
+      display: block;
+      float: right;
+    }
+
+  }
+
+  .temperature::after {
+    content: "°C"
+  }
+
+  .humidity::after {
+    content: "%"
+  }
+}

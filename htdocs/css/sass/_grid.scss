@@ -2,6 +2,6 @@
   @include container(800px);
 }
 
-.grid_12 {
-  @include span(12 of 12);
-}
+.grid_6 { @include span(6 of 12);}
+.grid_6:last-child { margin-right: 0}
+.grid_12 { @include span(12 of 12);}

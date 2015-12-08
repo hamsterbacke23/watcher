@@ -1,6 +1,7 @@
 .DS_S*
 ._*
 *.jpg
+log/
 data.json
 dist/
 images/

@@ -11,7 +11,7 @@ var absOutputPath = path.resolve(__dirname + '/../' + pjson.publicPath + '/' + p
 function resizeImages (images, size, x, y, alldone) {
 
   async.eachSeries(images, function(image, cb) {
-    if(image.substring(0,2) === '._' || !x || !y) {
+    if(size === 'big' || image.substring(0,2) === '._' || !x || !y) {
       cb();
       return;
     }

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Watcher</title>
+  <link href='https://fonts.googleapis.com/css?family=Nunito:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="dist/css/main.out.min.css">
+  <script src="dist/js/main.js"></script>
+
+</head>
+<body>
+  <div class="container">
+    <h2 class="time"></h2>
+    <div class="grid_12">
+      <a class="enlargeme">
+        <img class="preview" src="" alt="test">
+        <img class="big" src="" alt="test">
+      </a>
+    </div>
+
+
+    <div class="rowstart ">
+
+      <div class="gaugewrapper grid_6">
+        <div class="gauge">
+          <span class="meter"></span>
+        </div>
+        <span class="meta temperature"></span>
+      </div>
+
+      <div class="gaugewrapper grid_6">
+        <div class="gauge">
+          <span class="meter"></span>
+        </div>
+        <span class="meta humidity"></span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script type="text/javascript">
+  $(function() {
+    var $gauges = $('.gauge');
+    var tempSelector = '.temperature';
+    var humidSelector = '.humidity';
+    var maxTemp = 30;
+    var minTemp = 15;
+    var maxHumid = 90;
+    var minHumid = 15;
+    var tempDelta = maxTemp - minTemp;
+    var humidDelta = maxHumid - minHumid;
+    var metaEndpoint = '/meta.json';
+
+
+    function calcDegrees(value, minimum, delta) {
+      console.log(arguments);
+      // substract mintemparature for calculation
+      var calcValue = value - minimum;
+      // calculate the percentage of the delta
+      var percentage = calcValue / delta;
+      // calculate degrees, 100% is 90
+      return 180 - (percentage * 90);
+    }
+
+    function setGauges() {
+      $gauges.each(function() {
+        var $this = $(this);
+        var $meter = $this.find('.meter');
+
+        var $temperature = $this.parent().find(tempSelector);
+        var $humidity = $this.parent().find(humidSelector);
+
+        if ($temperature.length) {
+          var temperature = parseFloat($temperature.text(), 10);
+          var degrees = calcDegrees(temperature, minTemp, tempDelta);
+        }
+
+        if ($humidity.length) {
+          var humidity = parseFloat($humidity.text(), 10);
+          var degrees = calcDegrees(humidity, minHumid, humidDelta);
+        }
+
+        $meter.css({
+          'transform' : 'rotate(' + degrees + 'deg)'
+        });
+
+      });
+    }
+
+
+    $.ajax({
+      url : metaEndpoint,
+      dataType : 'json',
+      cache : false,
+      success : function (data) {
+        $(tempSelector).html(data.temperature);
+        $(humidSelector).html(data.humidity);
+        setGauges();
+      }
+    })
+  });
+  </script>
+</body>
+</html>

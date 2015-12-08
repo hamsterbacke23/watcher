@@ -46,7 +46,11 @@ function getData(images) {
     var image = {};
     var tmpData = {};
     var sizeKey;
+    var biggestKey;
     var stat;
+    var time;
+
+    biggestKey = pjson.resizeSizes[pjson.resizeSizes.length - 1].key;
 
     // stupid mac creates fucking random images
     if(curImg.substring(0,2) === '._') {
@@ -57,16 +61,16 @@ function getData(images) {
       sizeKey = pjson.resizeSizes[j].key;
       try {
         tmpData[sizeKey] = {};
-        tmpData[sizeKey]['time'] = fs.statSync(absOutputPath + '/' + sizeKey + '/' + curImg).mtime.getTime();
         tmpData[sizeKey]['uri'] =  '/' + pjson.imageoutPathrel + '/' + sizeKey + '/' + curImg;
-
       } catch (e) {
         continue;
       };
     };
 
     if(tmpData) {
-      tmpData.time = tmpData.medium.time;
+      try {
+        tmpData.time = fs.statSync(absOutputPath + '/' + biggestKey + '/' + curImg).mtime.getTime();
+      } catch(e) {}
       imagesData.push(tmpData);
     }
   };

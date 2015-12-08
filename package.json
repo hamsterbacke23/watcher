@@ -14,18 +14,20 @@
   "resizeSizes" : [
     {
       "key" : "small",
-      "x" : 480,
-      "y" : 320,
+      "x" : 640,
+      "y" : 360,
       "removeAfterDays" : 200
     },
     {
       "key" : "medium",
-      "x" : 1024,
-      "y" : 768,
+      "x" : 1280,
+      "y" : 720,
       "removeAfterDays" : 200
     },
     {
       "key" : "big",
+      "x" : 1980,
+      "y" : 1080,
       "removeAfterDays" : 30
     }
   ],
