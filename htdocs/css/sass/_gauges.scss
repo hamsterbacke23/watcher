@@ -1,8 +1,18 @@
-$gaugeWidth: 120px;
+$gaugeWidth: 30px;
+
+.gaugerow {
+  position: absolute;
+  bottom: 8px;
+  right: 0;
+  width: 100%;
+
+  .grid_2,
+  .grid_3 {
+    float: right;
+  }
+}
 
 .gauge {
-  float: left;
-  margin-right: 20px;
   position: relative;
   width: $gaugeWidth;
   height: $gaugeWidth;
@@ -14,7 +24,7 @@ $gaugeWidth: 120px;
     display: block;
     width: $gaugeWidth * 2;
     height: $gaugeWidth * 2;
-    background-color: $gray;
+    background-color: $grayTransparent;
     border-radius: 100%;
     position: absolute;
     left: -100%;
@@ -22,7 +32,7 @@ $gaugeWidth: 120px;
   }
 
   > .meter {
-    background-color: $turquoise;
+    background-color: $almostWhite;
     border-radius: $gaugeWidth $gaugeWidth 0 0;
     height: 100%;
     transform: rotate(180deg);
@@ -32,34 +42,38 @@ $gaugeWidth: 120px;
 
 .gaugewrapper {
   position: relative;
+  margin-bottom: 25px;
+  margin-right: 14px;
+  width: 140px;
+  float: right;
 
   .meta {
     position: absolute;
-    bottom: -40px;
-    left: $gaugeWidth + 10px;
+    bottom: -14px;
+    left: $gaugeWidth + 5px;
     font-family: Avenir;
     font-weight: 600;
-    font-size: 60px;
+    font-size: 40px;
     color: $almostWhite;
     float: left;
 
     &::after {
       content: "";
-      font-size: 25px;
-      color: $darkgray;
+      font-size: 15px;
+      color: $grayTransparent;
       margin-left: 2px;
-      padding-top: 35px;
+      padding-top: 25px;
       display: block;
       float: right;
     }
-
-  }
-
-  .temperature::after {
-    content: "°C"
-  }
-
-  .humidity::after {
-    content: "%"
   }
 }
+
+.temperature .meta::after {
+  content: "°C"
+}
+
+.humidity .meta::after {
+  content: "%"
+}
+

@@ -68,9 +68,9 @@ class makePicture:
       camera.resolution = (sizeX, sizeY)
       # camera.framerate = Fraction(1, 6)
       # camera.framerate = 2
-      # camera.shutter_speed = 800000
-      camera.exposure_mode = 'sports'
-      camera.iso = 200
+      camera.shutter_speed = 3500
+      # camera.exposure_mode = 'sports'
+      # camera.iso = 300
 
       # Camera warm-up time
       time.sleep(5)

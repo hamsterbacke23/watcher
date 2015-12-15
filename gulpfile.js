@@ -64,14 +64,14 @@ gulp.task('scripts', function() {
       customThemeDir + 'js/vendor/**/*.js',
       customThemeDir + 'js/custom/**/*.js'
     ])
+    .pipe(plumber({errorHandler: onError}))
     .pipe(concat('main.js'))
     // .pipe(jshint('.jshintrc'))
     // .pipe(jshint.reporter('default'))
     .pipe(gulp.dest(customThemeDir + 'dist/js'))
     .pipe(rename({suffix: '.min'}))
     .pipe(uglify())
-    .pipe(gulp.dest(customThemeDir + 'dist/js'))
-    .pipe(livereload());
+    .pipe(gulp.dest(customThemeDir + 'dist/js'));
 });
 
 

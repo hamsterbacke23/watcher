@@ -1,7 +1,14 @@
 .container {
-  @include container(800px);
+  @include container(1280px);
 }
 
-.grid_6 { @include span(6 of 12);}
 .grid_6:last-child { margin-right: 0}
+.grid_6 { @include span(12 of 12);}
 .grid_12 { @include span(12 of 12);}
+
+@media screen and(min-width: 768px) {
+  .grid_2 { @include span(2 of 12);}
+  .grid_3 { @include span(3 of 12);}
+  .grid_4 { @include span(4 of 12);}
+  .grid_6 { @include span(6 of 12);}
+}
