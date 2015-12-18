@@ -1,15 +1,15 @@
-
-var pjson = require('../package.json');
-var fs = require('fs');
-var path = require('path');
-var async = require('async');
-
+var  fs = require('fs'),
+  config = require('config'),
+  path = require('path'),
+  async = require('async'),
+  pjson = require('../package.json');
 
 var removeImageTime =  60 * 60 * 1000 * 24 * 200;
 
 // init others
-var absOutputPath = path.resolve(__dirname + '/../' + pjson.publicPath + '/' + pjson.imageoutPathrel);
-var testPath =  absOutputPath + '/medium';
+// var absOutputPath = path.resolve(__dirname + '/../' + pjson.publicPath + '/' + pjson.imageoutPathrel);
+var absOutputPath = config.paths.imagesOutPath;
+var imagesPath =  absOutputPath + '/medium';
 
 
 // function deleteImages(image) {
@@ -33,7 +33,7 @@ function readImages(dir) {
     if(path.extname(files[i]) === '.jpg' || path.extname(files[i]) === '.jpeg') {
         images.push(files[i]);
     }
-  };
+  }
 
   return images;
 }
@@ -61,11 +61,11 @@ function getData(images) {
       sizeKey = pjson.resizeSizes[j].key;
       try {
         tmpData[sizeKey] = {};
-        tmpData[sizeKey]['uri'] =  '/' + pjson.imageoutPathrel + '/' + sizeKey + '/' + curImg;
+        tmpData[sizeKey].uri =  '/' + pjson.imageoutPathrel + '/' + sizeKey + '/' + curImg;
       } catch (e) {
         continue;
-      };
-    };
+      }
+    }
 
     if(tmpData) {
       try {
@@ -73,11 +73,11 @@ function getData(images) {
       } catch(e) {}
       imagesData.push(tmpData);
     }
-  };
+  }
   return imagesData;
 }
 
-var images = readImages(testPath);
+var images = readImages(imagesPath);
 var imagesData = getData(images);
 
 fs.writeFile(__dirname + '/../' + pjson.publicPath + '/data.json', JSON.stringify(imagesData, null, 2) , 'utf-8');

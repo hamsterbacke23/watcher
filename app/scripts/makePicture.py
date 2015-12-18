@@ -34,24 +34,26 @@ class makePicture:
 
     if not force and not self.checkDayTime():
       print('Not in time range, exiting')
+      sys.exit(1)
       return
 
     self.setPackageData();
 
     filePath = self.getFilePath()
     if (self.takePicture(filePath)):
-      print('Success!')
+      print('Photo success!')
+      sys.stdout.flush()
+      return
 
   def setPackageData(self):
-    self.currentFilepath = os.path.dirname(os.path.realpath(__file__));
-
-    with open(self.currentFilepath + '/../package.json') as data_file:
+    self.basePath = os.path.abspath(__file__ + '/../../');
+    with open(self.basePath + '/../package.json') as data_file:
       self.pkgdata = json.load(data_file)
 
   def getFilePath(self):
 
     # camera = picamera.PiCamera()
-    path = self.currentFilepath + '/..' + self.pkgdata['publicPath'] + '/' + self.pkgdata['imageoutPathrel'] + '/new';
+    path = self.basePath + '/..' + self.pkgdata['publicPath'] + '/' + self.pkgdata['imageoutPathrel'] + '/new';
     if len(sys.argv) > 2:
         path = sys.argv[2]
 

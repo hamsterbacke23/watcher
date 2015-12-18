@@ -9,26 +9,27 @@
     "async": "^1.5.0",
     "gulp": "^3.9.0",
     "http": "0.0.0",
-    "lwip": "0.0.8"
+    "lwip": "0.0.8",
+    "q": "^1.4.1"
   },
-  "resizeSizes" : [
+  "resizeSizes": [
     {
-      "key" : "small",
-      "x" : 640,
-      "y" : 360,
-      "removeAfterDays" : 200
+      "key": "small",
+      "x": 640,
+      "y": 360,
+      "removeAfterDays": 200
     },
     {
-      "key" : "medium",
-      "x" : 1280,
-      "y" : 720,
-      "removeAfterDays" : 200
+      "key": "medium",
+      "x": 1280,
+      "y": 720,
+      "removeAfterDays": 200
     },
     {
-      "key" : "big",
-      "x" : 1980,
-      "y" : 1080,
-      "removeAfterDays" : 30
+      "key": "big",
+      "x": 1980,
+      "y": 1080,
+      "removeAfterDays": 30
     }
   ],
   "devDependencies": {

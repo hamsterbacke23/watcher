@@ -5,16 +5,12 @@ var gulp = require('gulp'),
     jshint       = require('gulp-jshint'),
     uglify       = require('gulp-uglify'),
     rename       = require('gulp-rename'),
-    //notify       = require('gulp-notify'),
     concat       = require('gulp-concat'),
     sourcemaps   = require('gulp-sourcemaps'),
     plumber      = require('gulp-plumber'),
     data_uri     = require('gulp-data-uri'),
     del          = require('del'),
-    livereload   = require('gulp-livereload');
-    // rsync        = require('rsyncwrapper').rsync,
     gutil        = require('gulp-util');
-    //nn           = require('node-notifier');
 
 
 // Custom
@@ -60,30 +56,38 @@ gulp.task('concatstyles', ['styles'], function() {
 gulp.task('scripts', function() {
   return gulp.src([
       customThemeDir + 'js/vendor/enquire.js',
-      customThemeDir + 'js/vendor/enquire.js',
       customThemeDir + 'js/vendor/**/*.js',
       customThemeDir + 'js/custom/**/*.js'
     ])
     .pipe(plumber({errorHandler: onError}))
     .pipe(concat('main.js'))
-    // .pipe(jshint('.jshintrc'))
-    // .pipe(jshint.reporter('default'))
-    .pipe(gulp.dest(customThemeDir + 'dist/js'))
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('default'))
+    .pipe(gulp.dest(customThemeDir + 'dist/js'));
+});
+
+gulp.task('minify', function() {
+  return gulp.src([
+      customThemeDir + 'dist/js/main.js'
+    ])
     .pipe(rename({suffix: '.min'}))
     .pipe(uglify())
     .pipe(gulp.dest(customThemeDir + 'dist/js'));
 });
 
+gulp.task('jshintdev', function() {
+  return gulp.src('app/**/*.js')
+    .pipe(jshint('.jshintrc'))
+    .pipe(jshint.reporter('default'));
+});
 
 gulp.task('watch', function() {
-  livereload.listen();
-
   // Watch .scss files
   gulp.watch(customThemeDir + 'css/sass/**/*.scss', ['concatstyles', 'styles']);
 
   // Watch .js files
   gulp.watch(customThemeDir + 'js/**/*.js', ['scripts']);
 
-
+  gulp.watch('app/**/*.js', ['jshintdev']);
 });
 

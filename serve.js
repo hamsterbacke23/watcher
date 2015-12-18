@@ -2,7 +2,7 @@ var http = require('http'),
     url = require('url'),
     path = require('path'),
     fs = require('fs')
-    port = process.argv[2] || 8888;
+    port = process.argv[2] || 8081;
 
 var pjson = require('./package.json');
 
@@ -20,7 +20,7 @@ http.createServer(function(request, response) {
       return;
     }
 
-    if (fs.statSync(filename).isDirectory()) filename += '/index.html';
+    // if (fs.statSync(filename).isDirectory()) filename += '/beta.html';
 
     fs.readFile(filename, 'binary', function(err, file) {
       if(err) {

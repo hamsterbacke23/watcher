@@ -1,11 +1,12 @@
-var pjson = require('../package.json');
-var fs = require('fs');
-var path = require('path');
-var lwip = require('lwip');
-var async = require('async');
+var pjson = require('../package.json'),
+  fs = require('fs'),
+  path = require('path'),
+  lwip = require('lwip'),
+  config = require('./config'),
+  async = require('async');
 
 var incomingFolder = '/new';
-var absOutputPath = path.resolve(__dirname + '/../' + pjson.publicPath + '/' + pjson.imageoutPathrel);
+var absOutputPath = config.paths.imagesOutPath;
 
 // Resize function
 function resizeImages (images, size, x, y, alldone) {
@@ -24,8 +25,7 @@ function resizeImages (images, size, x, y, alldone) {
     fs.readFile(inputPath, function(err, buffer) {
       lwip.open(buffer, 'jpg', function(err, img){
         if(err) {
-          console.log(err);
-          return;
+          throw err;
         }
 
         img.batch()
@@ -47,37 +47,37 @@ function go (cb) {
     if(path.extname(files[i]) === '.jpg' || path.extname(files[i]) === '.jpeg') {
         images.push(files[i]);
     }
-  };
+  }
 
-  if(images.length == 0) {
+  if(!images.length) {
     console.log('No new images');
     return;
   }
 
-  async.each(pjson.resizeSizes, function(size, cb) {
+  var done = function () {
+    // move originals
+    var prefix = 'big';
+    async.eachSeries(images, function(image, itemcb) {
+      fs.rename(
+        absOutputPath + incomingFolder + '/' + image,
+        absOutputPath + '/' + prefix + '/' + image,
+        itemcb
+      );
+    }, function () {
+      cb('kklkongk');
+    });
+
+  }
+
+  async.eachSeries(pjson.resizeSizes, function(size, callback) {
       var x = size.x;
       var y = size.y;
       var sizeKey = size.key;
-      resizeImages(images, sizeKey, x, y, cb);
-    },
-    function(err) {
-      if(err) {
-        console.log(err);
-        return;
-      }
-      // move originals
-      var prefix = 'big';
-      async.each(images, function(image) {
-        fs.rename(
-          absOutputPath + incomingFolder + '/' + image,
-          absOutputPath + '/' + prefix + '/' + image
-        );
-      });
-    });
+      resizeImages(images, sizeKey, x, y, callback);
+    }, done);
 }
 
-go();
-
+module.exports.go = go;
 
 
 
