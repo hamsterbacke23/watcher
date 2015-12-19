@@ -12,9 +12,15 @@ mongoose.connect('mongodb://localhost/test');
 var dataPointSchema = mongoose.Schema({
     timestamp: Number,
     images : [
-      small: String,
-      medium: String,
-      big: String
+      {
+        small: String
+      },
+      {
+        medium: String
+      },
+      {
+        big: String
+      }
     ],
     temperature : Number,
     humidity: Number
@@ -22,34 +28,42 @@ var dataPointSchema = mongoose.Schema({
 
 var DataPoint = mongoose.model('DataPoint', dataPointSchema);
 
-var dp = new DataPoint({timestamp: 12341234 });
-
-console.log(dp.timestamp); // 'Silence'
-
-
-function create (data) {
+/**
+ * Save function
+ */
+function create (data, cb) {
   var dp = new DataPoint(data);
-
-  db.update(function (err, dp) {
-    if (err) {
-      throw err;
-    }
-    return true;
-  });
+  dp.save(cb);
 }
 
-function retrieve(data) {
+function parseRangeFromTimestamp(timestamp) {
+  var start = new Date(timestamp);
+  start.setHours(0,0,0,0);
+  var end = new Date(timestamp);
+  end.setHours(23,59,59,999);
 
-  DataPoint.find(function (err, datapoints) {
-    if (err) {
-      throw err;
-    }
+  return {
+    start: start,
+    end: end
+  };
+}
 
-    console.log(datapoints);
-  })
+function queryRange(timestamp, cb) {
+  var ranges = parseRangeFromTimestamp(timestamp);
+  if (!ranges) {
+    return false;
+  }
+
+  DataPoint.find({
+      timestamp : {
+        $gt: ranges.start,
+        $lt: ranges.end
+      }
+    })
+    .exec(cb);
+
+  return true;
 }
 
 module.exports.create = create;
-module.exports.retrieve = retrieve;
-module.exports.update = update;
-module.exports.delete = delete;
+module.exports.queryRange = queryRange;

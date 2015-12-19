@@ -7,15 +7,17 @@ var pjson = require('../package.json'),
 
 var incomingFolder = '/new';
 var absOutputPath = config.paths.imagesOutPath;
-var publicOutputPath = config.paths.imagesOutPublicPath
+var publicOutputPath = config.paths.imagesOutPublicPath;
 
-// Resize function
+/**
+ * Resizes a single image
+ */
 function resizeImage (image, size, x, y, recordResizeCb, resizeDoneCb) {
 
   var singleItem = {};
 
   if(image.substring(0,2) === '._' || !x || !y) {
-    resizeDone();
+    resizeDoneCb();
     return;
   }
   var inputPath = absOutputPath + incomingFolder + '/' + image;
@@ -44,6 +46,10 @@ function resizeImage (image, size, x, y, recordResizeCb, resizeDoneCb) {
 
 }
 
+/**
+ * Main function
+ * @param  callback
+ */
 function go (cb) {
   var files = fs.readdirSync(absOutputPath + incomingFolder);
   var images = [];
@@ -60,6 +66,10 @@ function go (cb) {
     return;
   }
 
+  /**
+   * Callback for after we are done
+   * with all images and all sizes
+   */
   var resultImagesInfo = [];
   var done = function (err) {
     if(err) {
@@ -83,7 +93,7 @@ function go (cb) {
   var resizedImageInfo = {};
   var recordResizeCb = function (item) {
     resizedImageInfo[item.key] = item.path;
-  }
+  };
 
   async.each(images, function(image, imgCb) {
     timestamp = fs.statSync(absOutputPath + incomingFolder + '/' + image).mtime.getTime();
@@ -94,14 +104,18 @@ function go (cb) {
         var sizeKey = size.key;
         resizeImage(image, sizeKey, x, y, recordResizeCb, itemCb);
       }, function (err) {
-        resizedImageInfo.timestamp = timestamp;
-        resultImagesInfo.push(resizedImageInfo);
+        // pack one image info into the array an reset
+        resultImagesInfo.push({
+          images : resizedImageInfo,
+          timestamp : timestamp
+        });
         resizedImageInfo = {};
+
+        // we are done with this image
         imgCb();
       });
 
   }, done);
-
 
 }
 

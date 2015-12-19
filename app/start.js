@@ -2,6 +2,7 @@ var path  = require('path'),
   spawn = require('child_process').spawn,
   resize = require('./resizeImages'),
   config = require('./config'),
+  model = require('./model'),
   pjson = require('../package.json'),
   Q = require('q');
 
@@ -18,7 +19,7 @@ function getMakePicturePromise(resolve, reject) {
   return deferred.promise;
 }
 
-function getResizePicturePromise(resolve, reject) {
+function getResizePicturePromise() {
   var deferred = Q.defer();
 
   resize.go(function (troll) {
@@ -28,18 +29,24 @@ function getResizePicturePromise(resolve, reject) {
   return deferred.promise;
 }
 
-function getTemperaturePromise(resolve, reject) {
+function getTemperaturePromise(picData) {
   var deferred = Q.defer();
   var meta = spawn('python', ['-u', config.paths.scriptPath + '/getTemp.py', '2302', '4']);
 
   meta.stdout.on('data', function(data, err) {
-    console.log(data);
 
     if(err) {
       deferred.reject(err);
     }
-    deferred.resolve(data.toString());
+    console.log(data);
+    var info = JSON.parse(data);
+    for (var i = 0; i < picData.length; i++) {
+      picData[i].temperature = info.temperature;
+      picData[i].humidity = info.humidity;
+    }
+    deferred.resolve(picData);
   });
+
   return deferred.promise;
 }
 
@@ -50,20 +57,25 @@ getMakePicturePromise()
   .then(function () {
     return getResizePicturePromise();
   })
-  .then(function (pic) {
-    console.log('pic', pic);
-  })
-  .then(function () {
-    return getTemperaturePromise();
+  .then(function (picData) {
+    return getTemperaturePromise(picData);
   })
   .then(function (data) {
-    var json = JSON.parse(data);
-    console.log(json.temperature);
-    console.log(json.humidity);
+    model.create(data, function(err) {
+      console.log(err);
+    });
+    return;
+  })
+  .then(function() {
+    model.queryRange(Date.now / 1000, function(data){
+      console.log(data);
+    });
+
   })
   .catch(function (err) {
     console.log(err);
   })
   .done(function () {
     console.log('ended');
+    return;
   });
