@@ -2,6 +2,7 @@
 ._*
 *.jpg
 log/
+htdocs/meta.json
 data.json
 dist/
 images/
