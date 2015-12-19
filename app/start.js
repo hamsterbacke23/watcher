@@ -22,7 +22,6 @@ function getResizePicturePromise(resolve, reject) {
   var deferred = Q.defer();
 
   resize.go(function (troll) {
-    console.log(troll);
     deferred.resolve(troll);
   });
 
@@ -52,7 +51,7 @@ getMakePicturePromise()
     return getResizePicturePromise();
   })
   .then(function (pic) {
-    // console.log('pic', pic);
+    console.log('pic', pic);
   })
   .then(function () {
     return getTemperaturePromise();

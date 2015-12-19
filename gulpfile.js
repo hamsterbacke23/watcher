@@ -61,8 +61,6 @@ gulp.task('scripts', function() {
     ])
     .pipe(plumber({errorHandler: onError}))
     .pipe(concat('main.js'))
-    .pipe(jshint('.jshintrc'))
-    .pipe(jshint.reporter('default'))
     .pipe(gulp.dest(customThemeDir + 'dist/js'));
 });
 
@@ -75,8 +73,11 @@ gulp.task('minify', function() {
     .pipe(gulp.dest(customThemeDir + 'dist/js'));
 });
 
-gulp.task('jshintdev', function() {
-  return gulp.src('app/**/*.js')
+gulp.task('jshint', function() {
+  return gulp.src([
+      'app/**/*.js',
+      customThemeDir + 'js/custom/**/*.js'
+    ])
     .pipe(jshint('.jshintrc'))
     .pipe(jshint.reporter('default'));
 });
@@ -86,8 +87,8 @@ gulp.task('watch', function() {
   gulp.watch(customThemeDir + 'css/sass/**/*.scss', ['concatstyles', 'styles']);
 
   // Watch .js files
-  gulp.watch(customThemeDir + 'js/**/*.js', ['scripts']);
+  gulp.watch(customThemeDir + 'js/**/*.js', ['jshint', 'scripts']);
 
-  gulp.watch('app/**/*.js', ['jshintdev']);
+  gulp.watch('app/**/*.js', ['jshint']);
 });
 

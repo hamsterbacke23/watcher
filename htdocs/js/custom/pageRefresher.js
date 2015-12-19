@@ -6,7 +6,7 @@ tsModules.PageRefresher = (function () {
 
     init: function () {
       document.addEventListener('webkitvisibilitychange', function(evt) {
-        var isVisible = !this['hidden'];
+        var isVisible = !this.hidden;
         if (isVisible) {
           window.location.reload(true);
         }
@@ -18,14 +18,15 @@ tsModules.PageRefresher = (function () {
       });
 
       function refresh() {
-          if(new Date().getTime() - time >= (60000 * 30))
+          if(new Date().getTime() - time >= (60000 * 30)) {
               window.location.reload(true);
-          else
+          } else {
               setTimeout(refresh, 10000);
+          }
       }
 
       setTimeout(refresh, 10000);
     }
-  }
+  };
 
 })();

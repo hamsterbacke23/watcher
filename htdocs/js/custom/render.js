@@ -26,5 +26,5 @@ tsModules.Render = (function () {
       });
 
     }
-  }
+  };
 })();

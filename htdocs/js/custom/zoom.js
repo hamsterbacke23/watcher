@@ -19,5 +19,5 @@ tsModules.Zoom = (function () {
       });
 
     }
-  }
+  };
 })();

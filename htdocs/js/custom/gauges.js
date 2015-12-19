@@ -46,15 +46,16 @@ tsModules.Gauges = (function () {
           var $meter = $this.find('.meter');
           var $wrapper = $this.closest(wrapperSelector);
           var $meta = $wrapper.find('.meta');
+          var degrees, temperature, humidity;
 
           if ($wrapper.hasClass('temperature')) {
-            var temperature = parseFloat($meta.text(), 10);
-            var degrees = self.calcDegrees(temperature, minTemp, tempDelta);
+            temperature = parseFloat($meta.text(), 10);
+            degrees = self.calcDegrees(temperature, minTemp, tempDelta);
           }
 
           if ($wrapper.hasClass('humidity')) {
-            var humidity = parseFloat($meta.text(), 10);
-            var degrees = self.calcDegrees(humidity, minHumid, humidDelta);
+            humidity = parseFloat($meta.text(), 10);
+            degrees = self.calcDegrees(humidity, minHumid, humidDelta);
           }
 
           $meter.css({

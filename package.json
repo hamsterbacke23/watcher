@@ -4,12 +4,13 @@
   "description": "still image watcher",
   "main": "htdocs/index.html",
   "publicPath": "/htdocs",
-  "imageoutPathrel": "images/output",
+  "imageoutPathrel": "/images/output",
   "dependencies": {
     "async": "^1.5.0",
     "gulp": "^3.9.0",
     "http": "0.0.0",
     "lwip": "0.0.8",
+    "mongoose": "^4.3.3",
     "q": "^1.4.1"
   },
   "resizeSizes": [
