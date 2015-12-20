@@ -4,11 +4,16 @@ html {
   background-repeat: none;
   background: linear-gradient(to bottom,  #4c4c4c 25%,#222222 700px,#222222 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   min-height: 100%;
+  font-size: 100%;
 }
 
 h1,h2,h3,h4,h5,h6 {
   font-family: 'Nunito', sans-serif;
   font-weight: 400;
+}
+
+svg {
+  font-size: 12px;
 }
 
 .container {

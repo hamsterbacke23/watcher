@@ -1,7 +1,18 @@
 {
-  "watch": ["app"],
-  "ignore_watch" : ["node_modules", "htdocs"],
-  "watch_options": {
-    "followSymlinks": false
-  }
+  "apps" :[{
+    "name"        : "weatherapp",
+    "script"      : "app/api.js",
+    "ignore_watch" : ["node_modules", "htdocs"],
+    "cwd"         :  "./",
+    "watch":      true,
+    "watch_options": {
+      "followSymlinks": false
+    },
+    "env": {
+      "NODE_ENV": "development",
+    },
+    "env_production" : {
+       "NODE_ENV": "production"
+    }
+  }]
 }

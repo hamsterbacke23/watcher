@@ -40,7 +40,6 @@ function getCreatePromise (data) {
 
 function getQueryRangePromise(start, end) {
   var deferred = Q.defer();
-  var DataPoint = mongoose.model('DataPoint', dataPointSchema);
 
   DataPoint.find({
       timestamp : {
@@ -74,6 +73,37 @@ function getAllInRange(time, rangeTime) {
   return getQueryRangePromise(start, end);
 }
 
+function getLatestOnePromise() {
+  var deferred = Q.defer();
+
+  DataPoint.find()
+    .limit(1)
+    .sort({$natural: -1})
+    .exec(function (err, data) {
+      if(err) {
+        deferred.reject(err);
+      }
+      deferred.resolve(data);
+    });
+
+    return deferred.promise;
+}
+
+
+function getAllPromise() {
+  var deferred = Q.defer();
+
+  DataPoint.find()
+    .exec(function (err, data) {
+      if(err) {
+        deferred.reject(err);
+      }
+      deferred.resolve(data);
+    });
+
+    return deferred.promise;
+}
+
 /**
  * @param  {int}
  * @return {promise}
@@ -91,3 +121,5 @@ function parseDayRangeFromTimestamp(timestamp) {
 
 module.exports.getCreatePromise = getCreatePromise;
 module.exports.getAllInRange = getAllInRange;
+module.exports.getLatestOnePromise = getLatestOnePromise;
+module.exports.getAllPromise = getAllPromise;

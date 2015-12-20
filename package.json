@@ -17,7 +17,7 @@
   },
   "sensorType": 2302,
   "sensorGpio": 4,
-  "timeRange": 3600,
+  "timeRange": 900000,
   "resizeSizes": [
     {
       "key": "small",

@@ -67,15 +67,15 @@ getMakePicturePromise()
     return getTemperaturePromise(picData);
   })
   .then(function(data) {
-    var date = new Date().getTime();
-    return model.getAllInRange(date, (config.pkg.timeRange / 2) * 1000)
+    var startTime = new Date().getTime();
+    return model.getAllInRange(startTime, config.pkg.timeRange)
       .then(function (result) {
         // only create entry if no result found
         if(result && result.length) {
           return 'No entry created';
         }
         return model.getCreatePromise(data[0]); //TODO: create for all data
-      })
+      });
   })
   .then(function(data) {
     console.log('then', data);

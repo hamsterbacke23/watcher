@@ -5,6 +5,7 @@ $(function () {
   tsModules.Render.init();
   tsModules.Gauges.init();
   tsModules.Zoom.init();
+  tsModules.Chart.init();
 });
 
 

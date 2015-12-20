@@ -11,7 +11,7 @@ tsModules.Gauges = (function () {
     var minHumid = 25;
     var tempDelta = maxTemp - minTemp;
     var humidDelta = maxHumid - minHumid;
-    var metaEndpoint = '/meta.json';
+    var metaEndpoint = '/api/latest';
 
     return {
       init: function () {
@@ -21,8 +21,9 @@ tsModules.Gauges = (function () {
           dataType : 'json',
           cache : false,
           success : function (data) {
-            $(tempSelector).html(data.temperature);
-            $(humidSelector).html(data.humidity);
+            var latest = data[data.length - 1];
+            $(tempSelector).html(latest.temperature);
+            $(humidSelector).html(latest.humidity);
             self.setGauges();
           }
         });

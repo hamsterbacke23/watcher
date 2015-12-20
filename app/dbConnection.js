@@ -21,14 +21,14 @@ var gracefulExit = function() {
     console.log('Mongoose default connection with DB :' + db_server + ' is disconnected through app termination');
     process.exit(0);
   });
-}
+};
 
 // If the Node process ends, close the Mongoose connection
 process.on('SIGINT', gracefulExit).on('SIGTERM', gracefulExit);
 
 var connect = function () {
   return mongoose.connect('mongodb://localhost/' + db_server);
-}
+};
 
 
 module.exports.connect = connect;

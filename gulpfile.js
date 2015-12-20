@@ -35,9 +35,8 @@ gulp.task('styles', function() {
     .pipe(sass({ style: 'expanded' }))
     .pipe(data_uri())
     .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 8', 'ie 9', 'opera 12.1', 'ios 6', 'android 4'))
-    .pipe(sourcemaps.write(customThemeDir + 'dist/css'))
-    .pipe(gulp.dest(customThemeDir +  'dist/css'))
-    .pipe(livereload());
+    .pipe(sourcemaps.write('.'))
+    .pipe(gulp.dest(customThemeDir +  'dist/css'));
 });
 
 gulp.task('concatstyles', ['styles'], function() {
