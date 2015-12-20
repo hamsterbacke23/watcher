@@ -2,8 +2,7 @@ var path  = require('path'),
   spawn = require('child_process').spawn,
   resize = require('./resizeImages'),
   config = require('./config'),
-  // model = require('./model'),
-  pjson = require('../package.json'),
+  model = require('./model'),
   pythonShell = require('python-shell'),
   Q = require('q');
 
@@ -39,9 +38,9 @@ function getResizePicturePromise() {
 
 function getTemperaturePromise(picData) {
   var deferred = Q.defer();
-  // var meta = spawn('python', ['-u', config.paths.scriptPath + '/getTemp.py', '2302', '4']);
   var pyOptionsCustom = pyOptions;
-  pyOptionsCustom.args = ['2302', '4'];
+
+  pyOptionsCustom.args = [config.pkg.sensorType, config.pkg.sensorGpio];
   pythonShell.run('getTemp.py', pyOptionsCustom, function (err, data) {
     if(err) {
       deferred.reject(err);
@@ -67,23 +66,24 @@ getMakePicturePromise()
   .then(function (picData) {
     return getTemperaturePromise(picData);
   })
-  .then(function (data) {
-    console.log(data);
-    // model.create(data, function(err) {
-    //   console.log(err);
-    // });
-    // return;
+  .then(function(data) {
+    var date = new Date().getTime();
+    return model.getAllInRange(date, (config.pkg.timeRange / 2) * 1000)
+      .then(function (result) {
+        // only create entry if no result found
+        if(result && result.length) {
+          return 'No entry created';
+        }
+        return model.getCreatePromise(data[0]); //TODO: create for all data
+      })
   })
-  .then(function() {
-    // model.queryRange(Date.now, function(data){
-    //   console.log(data);
-    // });
-
+  .then(function(data) {
+    console.log('then', data);
   })
   .catch(function (err) {
     console.log(err);
   })
   .done(function () {
     console.log('ended');
-    return;
+    process.exit();
   });

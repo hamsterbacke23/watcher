@@ -1,6 +1,9 @@
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+var mongoose = require('mongoose'),
+  dbConnection = require('./dbConnection'),
+  Q = require('q');
 
+
+dbConnection.connect();
 
 // var db = mongoose.connection;
 // db.on('error', console.error.bind(console, 'connection error:'));
@@ -11,17 +14,7 @@ mongoose.connect('mongodb://localhost/test');
 
 var dataPointSchema = mongoose.Schema({
     timestamp: Number,
-    images : [
-      {
-        small: String
-      },
-      {
-        medium: String
-      },
-      {
-        big: String
-      }
-    ],
+    images : {},
     temperature : Number,
     humidity: Number
 });
@@ -31,39 +24,70 @@ var DataPoint = mongoose.model('DataPoint', dataPointSchema);
 /**
  * Save function
  */
-function create (data, cb) {
+function getCreatePromise (data) {
+  var deferred = Q.defer();
+
   var dp = new DataPoint(data);
-  dp.save(cb);
+  dp.save(function(err, dp) {
+    if(err) {
+      deferred.reject(err);
+    }
+    deferred.resolve(data);
+  });
+
+  return deferred.promise;
 }
 
-function parseRangeFromTimestamp(timestamp) {
-  var start = new Date(timestamp);
-  start.setHours(0,0,0,0);
-  var end = new Date(timestamp);
-  end.setHours(23,59,59,999);
-
-  return {
-    start: start,
-    end: end
-  };
-}
-
-function queryRange(timestamp, cb) {
-  var ranges = parseRangeFromTimestamp(timestamp);
-  if (!ranges) {
-    return false;
-  }
+function getQueryRangePromise(start, end) {
+  var deferred = Q.defer();
+  var DataPoint = mongoose.model('DataPoint', dataPointSchema);
 
   DataPoint.find({
       timestamp : {
-        $gt: ranges.start,
-        $lt: ranges.end
+        '$gte': start,
+        '$lte': end
       }
     })
-    .exec(cb);
+    .exec(function (err, data) {
+      if(err) {
+        deferred.reject(err);
+      }
+      deferred.resolve(data);
+    });
 
-  return true;
+    return deferred.promise;
 }
 
-module.exports.create = create;
-module.exports.queryRange = queryRange;
+
+/**
+ * Gets all entries within range time
+ * @param  int time in microseconds
+ * @param  int rangeTime in microseconds
+ * @return {promise} promise
+ */
+function getAllInRange(time, rangeTime) {
+  var start = time ? time : new Date().getTime();
+  start = start - rangeTime;
+  var end = time ? time : new Date().getTime();
+  end = end + rangeTime;
+
+  return getQueryRangePromise(start, end);
+}
+
+/**
+ * @param  {int}
+ * @return {promise}
+ */
+function parseDayRangeFromTimestamp(timestamp) {
+
+  var start = new Date(timestamp);
+  start.setHours(0,0,0,0).getTime();
+  var end = new Date(timestamp);
+  end.setHours(23,59,59,999).getTime();
+
+  return getQueryRangePromise(start, end);
+}
+
+
+module.exports.getCreatePromise = getCreatePromise;
+module.exports.getAllInRange = getAllInRange;
