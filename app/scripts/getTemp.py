@@ -1,4 +1,5 @@
-#!/usr/bin/python
+#!/usr/bin/python -u
+
 import sys
 import os
 import json
@@ -29,6 +30,7 @@ if humidity is not None and temperature is not None:
     'temperature' : temperature,
     'humidity': humidity
   }
+  sys.stdout.flush()
   print json.dumps(data);
   sys.stdout.flush()
 

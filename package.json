@@ -11,6 +11,7 @@
     "http": "0.0.0",
     "lwip": "0.0.8",
     "mongoose": "^4.3.3",
+    "python-shell": "^0.3.0",
     "q": "^1.4.1"
   },
   "resizeSizes": [

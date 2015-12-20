@@ -41,7 +41,7 @@ class makePicture:
 
     filePath = self.getFilePath()
     if (self.takePicture(filePath)):
-      print('Photo success!')
+      print json.dumps({'message' : 'Photo success!'})
       sys.stdout.flush()
       return
 

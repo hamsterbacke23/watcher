@@ -2,20 +2,28 @@ var path  = require('path'),
   spawn = require('child_process').spawn,
   resize = require('./resizeImages'),
   config = require('./config'),
-  model = require('./model'),
+  // model = require('./model'),
   pjson = require('../package.json'),
+  pythonShell = require('python-shell'),
   Q = require('q');
 
+var pyOptions = {
+  mode: 'json',
+  pythonOptions: ['-u'],
+  scriptPath: config.paths.scriptPath,
+  args: ['-f']
+};
 
 function getMakePicturePromise(resolve, reject) {
   var deferred = Q.defer();
-  var pic = spawn('python', ['-u', config.paths.scriptPath + '/makePicture.py', '-f']);
-  pic.stdout.on('data', function(data, err) {
+
+  pythonShell.run('makePicture.py', pyOptions, function (err, results) {
     if(err) {
       deferred.reject(err);
     }
-    deferred.resolve(data.toString());
+    deferred.resolve(results);
   });
+
   return deferred.promise;
 }
 
@@ -31,18 +39,17 @@ function getResizePicturePromise() {
 
 function getTemperaturePromise(picData) {
   var deferred = Q.defer();
-  var meta = spawn('python', ['-u', config.paths.scriptPath + '/getTemp.py', '2302', '4']);
-
-  meta.stdout.on('data', function(data, err) {
-
+  // var meta = spawn('python', ['-u', config.paths.scriptPath + '/getTemp.py', '2302', '4']);
+  var pyOptionsCustom = pyOptions;
+  pyOptionsCustom.args = ['2302', '4'];
+  pythonShell.run('getTemp.py', pyOptionsCustom, function (err, data) {
     if(err) {
       deferred.reject(err);
     }
-    console.log(data);
-    var info = JSON.parse(data);
+
     for (var i = 0; i < picData.length; i++) {
-      picData[i].temperature = info.temperature;
-      picData[i].humidity = info.humidity;
+      picData[i].temperature = data[0].temperature;
+      picData[i].humidity = data[0].humidity;
     }
     deferred.resolve(picData);
   });
@@ -61,15 +68,16 @@ getMakePicturePromise()
     return getTemperaturePromise(picData);
   })
   .then(function (data) {
-    model.create(data, function(err) {
-      console.log(err);
-    });
-    return;
+    console.log(data);
+    // model.create(data, function(err) {
+    //   console.log(err);
+    // });
+    // return;
   })
   .then(function() {
-    model.queryRange(Date.now / 1000, function(data){
-      console.log(data);
-    });
+    // model.queryRange(Date.now, function(data){
+    //   console.log(data);
+    // });
 
   })
   .catch(function (err) {
