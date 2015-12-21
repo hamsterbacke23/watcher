@@ -17,25 +17,24 @@
   },
   "sensorType": 2302,
   "sensorGpio": 4,
+  "startPhotoTime" : 21,
+  "endPhotoTime" : 13,
   "timeRange": 900000,
   "resizeSizes": [
     {
       "key": "small",
       "x": 640,
-      "y": 360,
-      "removeAfterDays": 200
+      "y": 360
     },
     {
       "key": "medium",
       "x": 1280,
-      "y": 720,
-      "removeAfterDays": 200
+      "y": 720
     },
     {
       "key": "big",
       "x": 1980,
-      "y": 1080,
-      "removeAfterDays": 30
+      "y": 1080
     }
   ],
   "devDependencies": {

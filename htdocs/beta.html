@@ -6,40 +6,47 @@
   <link href='https://fonts.googleapis.com/css?family=Nunito:400,700' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="dist/css/main.out.min.css">
   <script src="dist/js/main.js"></script>
-  <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="//d3js.org/d3.v3.js" charset="utf-8"></script>
 
 </head>
 <body>
-  <div class="container">
-    <h2 class="time"></h2>
-    <div class="grid_12">
-      <a class="enlargeme">
-        <img class="preview" src="" alt="test">
-        <img class="big" src="" alt="test">
-      </a>
+  <div class="gridwrapper">
+
+    <div class="container">
+      <h2 class="time"></h2>
+
+      <div class="grid_12">
+        <a class="enlargeme">
+          <img class="preview" src="" alt="test">
+          <img class="big" src="" alt="test">
+        </a>
+        <div class="separator"></div>
+      </div>
+
+      <div class="rowstart gaugerow">
+
+        <div class="gaugewrapper humidity">
+          <div class="gauge">
+            <span class="meter"></span>
+          </div>
+          <span class="meta "></span>
+        </div>
+
+        <div class="gaugewrapper temperature">
+          <div class="gauge">
+            <span class="meter"></span>
+          </div>
+          <span class="meta "></span>
+        </div>
+
+      </div>
+      <div class="separator"/></div>
     </div>
 
-
-    <div class="rowstart gaugerow">
-
-      <div class="gaugewrapper humidity">
-        <div class="gauge">
-          <span class="meter"></span>
-        </div>
-        <span class="meta "></span>
-      </div>
-
-      <div class="gaugewrapper temperature">
-        <div class="gauge">
-          <span class="meter"></span>
-        </div>
-        <span class="meta "></span>
-      </div>
-
+    <div class="grid_12 mainchart">
+      <svg id="chart" />
     </div>
   </div>
-
-  <svg id="chart" />
 
 </body>
 </html>

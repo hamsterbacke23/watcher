@@ -13,8 +13,21 @@ class makePicture:
   dayStart = 21
   dayEnd = 14
 
+
+  def setStartEndTimes(self):
+    dirname = os.path.dirname
+    baseDir = dirname(dirname(dirname(os.path.abspath(__file__))))
+    print(baseDir + '/package.json')
+    with open(baseDir + '/package.json') as dataFile:
+      pkg = json.load(dataFile)
+      print(pkg)
+      self.dayStart = pkg.startPhotoTime
+      self.dayEnd = pkg.endPhotoTime
+
+
   # Restricts picture taking to a certain time
   def checkDayTime(self):
+    self.setStartEndTimes()
     timestamp = datetime.datetime.now().time() # Throw away the date information
     time.sleep(1)
     dayStartTime = datetime.time(self.dayStart)
@@ -33,8 +46,8 @@ class makePicture:
     force = len(sys.argv) > 1 and sys.argv[1] == '-f'
 
     if not force and not self.checkDayTime():
-      print('Not in time range, exiting')
-      sys.exit(1)
+      print json.dumps({'message' : 'Not in time range, exiting!'})
+      sys.exit(0)
       return
 
     self.setPackageData();

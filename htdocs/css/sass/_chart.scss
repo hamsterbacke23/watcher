@@ -1,13 +1,42 @@
-path {
-    stroke: steelblue;
-    stroke-width: 2;
-    fill: none;
-}
+.mainchart {
+  padding: 20px;
+  box-sizing: border-box;
+  fill: $gray;
 
-.axis path,
-.axis line {
+  path.chartline {
+    stroke-width: 3;
     fill: none;
-    stroke: grey;
-    stroke-width: 1;
-    shape-rendering: crispEdges;
+    stroke-linecap: round;
+  }
+
+  path.humidity {
+    stroke: $humidityFull;
+  }
+
+  path.temperature {
+    stroke: $tempFull;
+  }
+
+  .axis path,
+  .axis line {
+      fill: none;
+      stroke: grey;
+      stroke-width: 2;
+      shape-rendering: crispEdges;
+  }
+
+  .y-axis-left {
+    fill: $tempFull;
+  }
+
+  .y-axis-right {
+    fill: $humidityFull;
+  }
+
+  .area-temperature {
+    fill: $tempTransparent;
+  }
+  .area-humidity {
+    fill: $humidityTransparent;
+  }
 }

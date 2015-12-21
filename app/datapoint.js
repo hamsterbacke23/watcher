@@ -9,8 +9,7 @@ var path  = require('path'),
 var pyOptions = {
   mode: 'json',
   pythonOptions: ['-u'],
-  scriptPath: config.paths.scriptPath,
-  args: ['-f']
+  scriptPath: config.paths.scriptPath
 };
 
 function getMakePicturePromise(resolve, reject) {

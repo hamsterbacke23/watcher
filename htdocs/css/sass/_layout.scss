@@ -1,10 +1,11 @@
 html {
-  background-color: #222; // Old browsers
+  background-color: $verydarkgray;
   color: white;
   background-repeat: none;
-  background: linear-gradient(to bottom,  #4c4c4c 25%,#222222 700px,#222222 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background: linear-gradient(to bottom,  $middlegray 25%,$verydarkgray 700px,$verydarkgray 100%);
   min-height: 100%;
   font-size: 100%;
+  font-family: 'Nunito', sans-serif;
 }
 
 h1,h2,h3,h4,h5,h6 {
@@ -45,4 +46,8 @@ img.big {
   right: 20px;
   font-size: 14px;
   z-index:4;
+}
+
+.separator {
+  clear: both;
 }
