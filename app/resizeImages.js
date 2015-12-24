@@ -1,5 +1,4 @@
-var pjson = require('../package.json'),
-  fs = require('fs'),
+var fs = require('fs'),
   path = require('path'),
   lwip = require('lwip'),
   config = require('./config'),
@@ -8,6 +7,7 @@ var pjson = require('../package.json'),
 var incomingFolder = '/new';
 var absOutputPath = config.paths.imagesOutPath;
 var publicOutputPath = config.paths.imagesOutPublicPath;
+
 
 /**
  * Resizes a single image
@@ -51,6 +51,7 @@ function resizeImage (image, size, x, y, recordResizeCb, resizeDoneCb) {
  * @param  callback
  */
 function go (cb) {
+
   var files = fs.readdirSync(absOutputPath + incomingFolder);
   var images = [];
   var timestamp;
@@ -60,9 +61,8 @@ function go (cb) {
         images.push(files[i]);
     }
   }
-
   if(!images.length) {
-    console.log('No new images');
+    cb();
     return;
   }
 
@@ -98,7 +98,7 @@ function go (cb) {
   async.each(images, function(image, imgCb) {
     timestamp = fs.statSync(absOutputPath + incomingFolder + '/' + image).mtime.getTime();
 
-    async.each(pjson.resizeSizes, function(size, itemCb) {
+    async.each(config.pkg.resizeSizes, function(size, itemCb) {
         var x = size.x;
         var y = size.y;
         var sizeKey = size.key;

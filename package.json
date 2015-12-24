@@ -2,9 +2,6 @@
   "name": "watcher",
   "version": "0.0.1",
   "description": "still image watcher",
-  "main": "htdocs/index.html",
-  "publicPath": "/htdocs",
-  "imageoutPathrel": "/images/output",
   "dependencies": {
     "async": "^1.5.0",
     "express": "^4.13.3",
@@ -15,28 +12,32 @@
     "python-shell": "^0.3.0",
     "q": "^1.4.1"
   },
-  "sensorType": 2302,
-  "sensorGpio": 4,
-  "startPhotoTime" : 21,
-  "endPhotoTime" : 13,
-  "timeRange": 900000,
-  "resizeSizes": [
-    {
-      "key": "small",
-      "x": 640,
-      "y": 360
-    },
-    {
-      "key": "medium",
-      "x": 1280,
-      "y": 720
-    },
-    {
-      "key": "big",
-      "x": 1980,
-      "y": 1080
-    }
-  ],
+  "watcher" : {
+    "publicPath": "/htdocs",
+    "imageoutPathrel": "/images/output",
+    "sensorType": 2302,
+    "sensorGpio": 4,
+    "startPhotoTime" : "20:40",
+    "endPhotoTime" : "14:50",
+    "dataPointTimeIntervall": 900000,
+    "resizeSizes": [
+      {
+        "key": "small",
+        "x": 640,
+        "y": 360
+      },
+      {
+        "key": "medium",
+        "x": 1280,
+        "y": 720
+      },
+      {
+        "key": "big",
+        "x": 1980,
+        "y": 1080
+      }
+    ]
+  },
   "devDependencies": {
     "del": "^2.1.0",
     "gulp-autoprefixer": "^3.1.0",

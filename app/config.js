@@ -1,4 +1,4 @@
-var pkg = require('../package.json'),
+var pkg = require('../package.json').watcher,
   path = require('path');
 
 var basePath = path.resolve(__dirname + '/../');

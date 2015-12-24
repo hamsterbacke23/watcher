@@ -17,7 +17,7 @@ function getMakePicturePromise(resolve, reject) {
 
   pythonShell.run('makePicture.py', pyOptions, function (err, results) {
     if(err) {
-      deferred.reject(err);
+      deferred.reject('Error: ', err);
     }
     deferred.resolve(results);
   });
@@ -35,7 +35,7 @@ function getResizePicturePromise() {
   return deferred.promise;
 }
 
-function getTemperaturePromise(picData) {
+function getClimatePromise(picData) {
   var deferred = Q.defer();
   var pyOptionsCustom = pyOptions;
 
@@ -44,15 +44,25 @@ function getTemperaturePromise(picData) {
     if(err) {
       deferred.reject(err);
     }
-
-    for (var i = 0; i < picData.length; i++) {
-      picData[i].temperature = data[0].temperature;
-      picData[i].humidity = data[0].humidity;
-    }
-    deferred.resolve(picData);
+    deferred.resolve(data);
   });
 
   return deferred.promise;
+}
+
+function attachClimateInfoToImage(climateInfo, picData) {
+  // if no image then just create an array with data
+  if(!picData || !picData.length) {
+    return [{
+      temperature : climateInfo[0].temperature,
+      humidity : climateInfo[0].humidity
+    }];
+  }
+  for (var i = 0; i < picData.length; i++) {
+    picData[i].temperature = climateInfo[0].temperature;
+    picData[i].humidity = climateInfo[0].humidity;
+  }
+  return picData;
 }
 
 getMakePicturePromise()
@@ -63,11 +73,18 @@ getMakePicturePromise()
     return getResizePicturePromise();
   })
   .then(function (picData) {
-    return getTemperaturePromise(picData);
+    return getClimatePromise()
+      .then(function (result) {
+        return attachClimateInfoToImage(result, picData);
+      });
   })
   .then(function(data) {
+    if(!data || !data.length) {
+      return;
+    }
+
     var startTime = new Date().getTime();
-    return model.getAllInRange(startTime, config.pkg.timeRange)
+    return model.getAllInRange(startTime, config.pkg.dataPointTimeIntervall)
       .then(function (result) {
         // only create entry if no result found
         if(result && result.length) {
@@ -77,10 +94,12 @@ getMakePicturePromise()
       });
   })
   .then(function(data) {
-    console.log('then', data);
+    if (data) {
+      console.log('DB entry: ', data);
+    }
   })
   .catch(function (err) {
-    console.log(err);
+    console.log('Error: ', err);
   })
   .done(function () {
     console.log('ended');
