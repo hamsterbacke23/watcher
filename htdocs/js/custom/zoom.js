@@ -11,7 +11,6 @@ tsModules.Zoom = (function () {
         var $this = $(this);
         var fileName = $this.find('img.big').attr('src');
 
-        console.log(fileName);
         $this.zoom({
           url: fileName,
           on : 'grab'

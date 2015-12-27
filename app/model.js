@@ -70,7 +70,7 @@ function getLatestOnePromise() {
 
   DataPoint.find()
     .limit(1)
-    .sort({$natural: -1})
+    .sort({_id: -1})
     .exec(function (err, data) {
       if(err) {
         deferred.reject(err);
@@ -82,10 +82,15 @@ function getLatestOnePromise() {
 }
 
 
-function getAllPromise() {
+function getSincePromise(sinceTimestamp) {
   var deferred = Q.defer();
 
-  DataPoint.find()
+  if(!sinceTimestamp) {
+    sinceTimestamp = 0;
+  }
+  DataPoint.find({
+    'timestamp' : { $gt : sinceTimestamp }
+  })
     .exec(function (err, data) {
       if(err) {
         deferred.reject(err);
@@ -114,4 +119,4 @@ function parseDayRangeFromTimestamp(timestamp) {
 module.exports.getCreatePromise = getCreatePromise;
 module.exports.getAllInRange = getAllInRange;
 module.exports.getLatestOnePromise = getLatestOnePromise;
-module.exports.getAllPromise = getAllPromise;
+module.exports.getSincePromise = getSincePromise;

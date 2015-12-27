@@ -83,6 +83,12 @@ getMakePicturePromise()
       return;
     }
 
+    for (var i = 0; i < data.length; i++) {
+      if(!data[i].timestamp) {
+        data[i].timestamp = Date.now();
+      }
+    }
+
     var startTime = new Date().getTime();
     return model.getAllInRange(startTime, config.pkg.dataPointTimeIntervall)
       .then(function (result) {

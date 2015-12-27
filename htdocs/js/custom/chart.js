@@ -2,27 +2,57 @@ var tsModules = tsModules || {};
 
 tsModules.Chart = (function () {
 
-  var endpoint = '/api/all';
+  var endpoint = '/api/';
+  var rangeSelectSel = '[name="selectDayRange"]';
 
   return {
 
     init: function () {
+      // this.setChart(0);
+      this.initRangeSelect();
+    },
+
+    setChart: function (sinceTime) {
       var self = this;
       $.ajax({
-        url : endpoint,
+        url : endpoint + sinceTime,
         dataType : 'json',
         cache : false,
-        success : self.createChart
+        success : function (data) {
+          if(!data) {
+            return;
+          }
+          self.createChart(data, sinceTime);
+        }
       });
     },
 
-    createChart: function (data) {
+    setRangeSelectData : function ($el) {
+      var days = parseInt($el.val(), 10);
+
+      var d = new Date();
+      this.setChart(d.setDate(d.getDate() + days));
+    },
+
+    initRangeSelect: function () {
+      var self = this;
+      var $select = $(rangeSelectSel);
+
+      $select.on('change', function () {
+        var $this = $(this);
+        self.setRangeSelectData($this);
+      });
+      this.setRangeSelectData($select);
+
+    },
+
+    createChart: function (data, sinceTime) {
       var d3 = window.d3;
       // Get the data
       data.forEach(function(d) {
-          d.timestamp = new Date(d.timestamp);
-          d.humidity = +d.humidity;
-          d.temperature = d.temperature ? +d.temperature : null;
+        d.date = d.timestamp ? new Date(d.timestamp) : null;
+        d.humidity =  d.humidity ? +d.humidity : null;
+        d.temperature = d.temperature ? +d.temperature : null;
       });
       // Set the dimensions of the canvas / graph
       var margin = {top: 20, right: 40, bottom: 20, left: 40},
@@ -47,13 +77,13 @@ tsModules.Chart = (function () {
 
       // Define the line
       var valueline0 = d3.svg.line()
-        .defined(function(d) { return d.humidity && d.timestamp; })
-        .x(function(d) { return x(new Date(d.timestamp)); })
+        .defined(function(d) { return d.humidity && d.date; })
+        .x(function(d) { return x(new Date(d.date)); })
         .y(function(d) { return y0(d.humidity); });
 
       var valueline1 = d3.svg.line()
-        .defined(function(d) { return d.temperature && d.timestamp; })
-        .x(function(d) { return x(new Date(d.timestamp)); })
+        .defined(function(d) { return d.temperature && d.date; })
+        .x(function(d) { return x(new Date(d.date)); })
         .y(function(d) { return y1(d.temperature); });
 
       var area1 = d3.svg.area()
@@ -69,7 +99,10 @@ tsModules.Chart = (function () {
         .y0(y0(0));
 
       // Adds the svg canvas
-      var svg = d3.select('#chart')
+      var svg = d3.select('#chart');
+      svg.selectAll('svg > *').remove();
+
+      svg = d3.select('#chart')
               .attr('viewBox', '0 0 '  +
                  (width + margin.left + margin.right) + ' ' +
                  (height + margin.top + margin.bottom))
@@ -78,55 +111,78 @@ tsModules.Chart = (function () {
               .attr('transform',
                     'translate(' + margin.left + ',' + margin.top + ')');
 
+      // Scale the range of the data
+      x.domain(d3.extent(data, function(d) { return d.date; }));
+      y0.domain([
+        d3.min(data, function(d) { return d.humidity; }),
+        d3.max(data, function(d) { return d.humidity; })
+      ]);
+      y1.domain([
+        d3.min(data, function(d) { return d.temperature; }),
+        d3.max(data, function(d) { return d.temperature; })
+      ]);
 
-          // Scale the range of the data
-          x.domain(d3.extent(data, function(d) { return d.timestamp; }));
-          y0.domain([
-            d3.min(data, function(d) { return d.humidity; }),
-            d3.max(data, function(d) { return d.humidity; })
-          ]);
-          y1.domain([
-            d3.min(data, function(d) { return d.temperature; }),
-            d3.max(data, function(d) { return d.temperature; })
-          ]);
+      svg.append('path')
+        .attr('class', 'chartline temperature')
+        .attr('d', valueline1(data));
 
-          svg.append('path')
-            .attr('class', 'chartline temperature')
-            .attr('d', valueline1(data));
-
-          svg.append('path')
-            .attr('class', 'chartline humidity')
-            .attr('d', valueline0(data));
+      svg.append('path')
+        .attr('class', 'chartline humidity')
+        .attr('d', valueline0(data));
 
 
-          // Add the X Axis
-          svg.append('g')
-            .attr('class', 'x-axis axis')
-            .attr('transform', 'translate(0,' + height + ')')
-            .call(xAxis);
+      // Add the X Axis
+      svg.append('g')
+        .attr('class', 'x-axis axis')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(xAxis);
 
-          // Add the Z Axis
-          svg.append('g')
-            .attr('class', 'y-axis-right y-axis axis')
-            .attr('transform', 'translate(' + width + ' ,0)')
-            .call(yAxisRight);
+      // Add the Z Axis
+      svg.append('g')
+        .attr('class', 'y-axis-right y-axis axis')
+        .attr('transform', 'translate(' + width + ' ,0)')
+        .call(yAxisRight);
 
-          // Add the Y Axis
-          svg.append('g')
-            .attr('class', 'y-axis-left y-axis axis')
-            .call(yAxisLeft);
+      // Add the Y Axis
+      svg.append('g')
+        .attr('class', 'y-axis-left y-axis axis')
+        .call(yAxisLeft);
 
-          // Area
-          svg.append('path')
-              .datum(data)
-              .attr('class', 'area area-humidity')
-              .attr('d', area0);
+      // Area
+      svg.append('path')
+          .datum(data)
+          .attr('class', 'area area-humidity')
+          .attr('d', area0);
 
-          svg.append('path')
-              .datum(data)
-              .attr('class', 'area area-temperature')
-              .attr('d', area1);
+      svg.append('path')
+          .datum(data)
+          .attr('class', 'area area-temperature')
+          .attr('d', area1);
 
-      }
-    };
+      //points
+      svg.selectAll('.bobble.bobble-temperature')
+           .data(data)
+         .enter().append('a')
+           .attr('class', 'bobble bobble-temperature')
+           .attr('xlink:href', function(d) {
+              return endpoint + d.timestamp;
+            })
+             .append('circle')
+             .attr('cx', valueline1.x())
+             .attr('cy', valueline1.y())
+             .attr('r', 3.5);
+
+      svg.selectAll('.bobble.bobble-humidity')
+           .data(data)
+         .enter().append('a')
+           .attr('class', 'bobble bobble-humidity')
+           .attr('xlink:href', function(d) {
+              return endpoint + d.timestamp;
+            })
+             .append('circle')
+             .attr('cx', valueline0.x())
+             .attr('cy', valueline0.y())
+             .attr('r', 3.5);
+    }
+  };
 })();

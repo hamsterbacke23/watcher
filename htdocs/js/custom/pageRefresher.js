@@ -20,6 +20,7 @@ tsModules.PageRefresher = (function () {
       function refresh() {
           if(new Date().getTime() - time >= (60000 * 30)) {
               window.location.reload(true);
+              $('select').change();
           } else {
               setTimeout(refresh, 10000);
           }

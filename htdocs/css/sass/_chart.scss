@@ -1,7 +1,11 @@
 .mainchart {
-  padding: 20px;
+  // padding: 20px;
   box-sizing: border-box;
   fill: $gray;
+
+  .selectrange {
+    float: right;
+  }
 
   path.chartline {
     stroke-width: 3;
@@ -38,5 +42,19 @@
   }
   .area-humidity {
     fill: $humidityTransparent;
+  }
+
+  .bobble-humidity {
+    display: none;
+    fill: $humidityFull;
+  }
+
+  .bobble-temperature {
+    display: none;
+    fill: $tempFull;
+  }
+
+  &:hover .bobble {
+    display: block;
   }
 }

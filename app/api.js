@@ -9,8 +9,8 @@ app.get('/api/latest', function (req, res) {
     });
 });
 
-app.get('/api/all', function (req, res) {
-  model.getAllPromise()
+app.get('/api/:timestamp', function (req, res) {
+  model.getSincePromise(req.params.timestamp)
     .then(function (data) {
       res.send(data);
     });

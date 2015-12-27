@@ -11,6 +11,11 @@ tsModules.Render = (function () {
         cache : false,
         success : function (data) {
           var latest = data[data.length - 1];
+          if(!latest.images) {
+            $('img.preview').remove();
+            $('body').prepend($('<div style="height: 500px; width: 100%; background: black"></div>'));
+            return;
+          }
           $('img.preview').attr('src', latest.images.medium);
           $('img.big').attr('src', latest.images.big);
           tsModules.Zoom.init();

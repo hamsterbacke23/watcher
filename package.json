@@ -18,7 +18,7 @@
     "sensorType": 2302,
     "sensorGpio": 4,
     "startPhotoTime" : "20:40",
-    "endPhotoTime" : "14:50",
+    "endPhotoTime" : "14:40",
     "dataPointTimeIntervall": 900000,
     "resizeSizes": [
       {
