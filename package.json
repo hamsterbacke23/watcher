@@ -17,9 +17,9 @@
     "imageoutPathrel": "/images/output",
     "sensorType": 2302,
     "sensorGpio": 4,
-    "startPhotoTime" : "20:40",
-    "endPhotoTime" : "14:40",
-    "dataPointTimeIntervall": 900000,
+    "startPhotoTime" : "21:10",
+    "endPhotoTime" : "9:05",
+    "dataPointTimeIntervall": 1000000,
     "resizeSizes": [
       {
         "key": "small",

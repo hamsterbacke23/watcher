@@ -6,24 +6,50 @@ tsModules.Gauges = (function () {
     var tempSelector = '.temperature .meta';
     var humidSelector = '.humidity .meta';
     var maxTemp = 25;
-    var minTemp = 19;
+    var minTemp = 18;
     var maxHumid = 65;
     var minHumid = 25;
     var tempDelta = maxTemp - minTemp;
     var humidDelta = maxHumid - minHumid;
-    var metaEndpoint = '/api/latest';
+    var endpoint = '/api/one/';
 
     return {
-      init: function () {
+
+      setHashChangeListener : function () {
         var self = this;
+
+        window.addEventListener('hashchange', function () {
+          self.initGauges();
+        }, false);
+
+        self.initGauges();
+      },
+
+      init: function () {
+        this.setHashChangeListener();
+      },
+
+      initGauges: function () {
+        var self = this;
+        var data = tsModules.Router.getDataFromHashUrl();
+
+        var apiurl = endpoint + data.startTime + '/' + data.rangeTime;
+
         $.ajax({
-          url : metaEndpoint,
+          url : apiurl,
           dataType : 'json',
           cache : false,
           success : function (data) {
             var latest = data[data.length - 1];
-            $(tempSelector).html(latest.temperature);
-            $(humidSelector).html(latest.humidity);
+            if(!latest) {
+              return;
+            }
+            if(latest.temperature) {
+              $(tempSelector).html(latest.temperature);
+            }
+            if(latest.humidity) {
+              $(humidSelector).html(latest.humidity);
+            }
             self.setGauges();
           }
         });

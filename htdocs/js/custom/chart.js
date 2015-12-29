@@ -3,35 +3,59 @@ var tsModules = tsModules || {};
 tsModules.Chart = (function () {
 
   var endpoint = '/api/';
+  var dotClass = 'bobbel';
   var rangeSelectSel = '[name="selectDayRange"]';
+  var chartContainerSel = '.mainchart';
+  var dotRadius = 2.5;
 
   return {
 
     init: function () {
-      // this.setChart(0);
       this.initRangeSelect();
+      this.setHashChangeListener();
     },
 
-    setChart: function (sinceTime) {
+    setHashChangeListener : function () {
       var self = this;
+      window.addEventListener('hashchange', function () {
+        self.setChart();
+        self.updateRangeSelect();
+      }, false);
+      self.setChart();
+    },
+
+    setChart: function (startTime, rangeTime) {
+      var self = this;
+      var data = tsModules.Router.getDataFromHashUrl();
+      var apiurl = endpoint + data.startTime + '/' + data.rangeTime;
+
       $.ajax({
-        url : endpoint + sinceTime,
+        url : apiurl,
         dataType : 'json',
         cache : false,
         success : function (data) {
           if(!data) {
             return;
           }
-          self.createChart(data, sinceTime);
+          self.createChart(data);
         }
       });
     },
 
-    setRangeSelectData : function ($el) {
-      var days = parseInt($el.val(), 10);
+    updateRangeSelect : function () {
+      var $select = $(rangeSelectSel);
+      var data = tsModules.Router.getDataFromHashUrl();
+      if(data.rangeTime) {
+        var days =  Math.ceil(data.rangeTime / (1000 * 3600 * 24));
+        $select.val(days);
+      }
+    },
 
-      var d = new Date();
-      this.setChart(d.setDate(d.getDate() + days));
+    setRangeSelectData : function ($el) {
+      var days = Math.abs(parseInt($el.val(), 10));
+
+      var now = new Date();
+      tsModules.Router.setNewHashUrl(now.getTime(), 24 * 3600 * 1000 * days);
     },
 
     initRangeSelect: function () {
@@ -42,11 +66,10 @@ tsModules.Chart = (function () {
         var $this = $(this);
         self.setRangeSelectData($this);
       });
-      this.setRangeSelectData($select);
 
     },
 
-    createChart: function (data, sinceTime) {
+    createChart: function (data, startTime) {
       var d3 = window.d3;
       // Get the data
       data.forEach(function(d) {
@@ -160,29 +183,29 @@ tsModules.Chart = (function () {
           .attr('d', area1);
 
       //points
-      svg.selectAll('.bobble.bobble-temperature')
+      svg.selectAll('.' + dotClass + '.' + dotClass + '-temperature')
            .data(data)
          .enter().append('a')
-           .attr('class', 'bobble bobble-temperature')
+           .attr('class', dotClass + ' ' + dotClass + '-temperature')
            .attr('xlink:href', function(d) {
-              return endpoint + d.timestamp;
+              return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
             })
              .append('circle')
              .attr('cx', valueline1.x())
              .attr('cy', valueline1.y())
-             .attr('r', 3.5);
+             .attr('r', dotRadius);
 
-      svg.selectAll('.bobble.bobble-humidity')
+      svg.selectAll('.' + dotClass + '.' + dotClass + '-humidity')
            .data(data)
          .enter().append('a')
-           .attr('class', 'bobble bobble-humidity')
+           .attr('class', dotClass + ' ' + dotClass + '-humidity')
            .attr('xlink:href', function(d) {
-              return endpoint + d.timestamp;
+              return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
             })
              .append('circle')
              .attr('cx', valueline0.x())
              .attr('cy', valueline0.y())
-             .attr('r', 3.5);
+             .attr('r', dotRadius);
     }
   };
 })();

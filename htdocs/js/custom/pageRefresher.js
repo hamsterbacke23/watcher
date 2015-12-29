@@ -13,7 +13,7 @@ tsModules.PageRefresher = (function () {
       });
 
       var time = new Date().getTime();
-      $(document.body).bind("mousemove keypress", function(e) {
+      $(document.body).bind('mousemove keypress', function(e) {
           time = new Date().getTime();
       });
 

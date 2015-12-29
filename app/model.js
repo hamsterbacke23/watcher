@@ -56,21 +56,22 @@ function getQueryRangePromise(start, end) {
  * @param  int rangeTime in microseconds
  * @return {promise} promise
  */
-function getAllInRange(time, rangeTime) {
+function getAllInRangePromise(time, rangeTime) {
+  time = +time;
+  rangeTime = +rangeTime;
   var start = time ? time : new Date().getTime();
   start = start - rangeTime;
   var end = time ? time : new Date().getTime();
   end = end + rangeTime;
-
   return getQueryRangePromise(start, end);
 }
 
-function getLatestOnePromise() {
+function getSinglePromise(timestamp) {
   var deferred = Q.defer();
 
-  DataPoint.find()
-    .limit(1)
-    .sort({_id: -1})
+  DataPoint.find({
+      timestamp : timestamp
+    })
     .exec(function (err, data) {
       if(err) {
         deferred.reject(err);
@@ -117,6 +118,6 @@ function parseDayRangeFromTimestamp(timestamp) {
 
 
 module.exports.getCreatePromise = getCreatePromise;
-module.exports.getAllInRange = getAllInRange;
-module.exports.getLatestOnePromise = getLatestOnePromise;
+module.exports.getAllInRangePromise = getAllInRangePromise;
+module.exports.getSinglePromise = getSinglePromise;
 module.exports.getSincePromise = getSincePromise;

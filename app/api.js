@@ -2,18 +2,26 @@ var express = require('express'),
      app = express(),
      model = require('./model');
 
-app.get('/api/latest', function (req, res) {
-  model.getLatestOnePromise()
+app.get('/api/one/:timestamp/:range?', function (req, res) {
+  model.getSinglePromise(req.params.timestamp)
     .then(function (data) {
       res.send(data);
     });
 });
 
-app.get('/api/:timestamp', function (req, res) {
-  model.getSincePromise(req.params.timestamp)
-    .then(function (data) {
-      res.send(data);
-    });
+app.get('/api/:timestamp/:range?', function (req, res) {
+  if(req.params.range) {
+    model.getAllInRangePromise(req.params.timestamp, req.params.range)
+      .then(function (data) {
+        res.send(data);
+      });
+  } else {
+    model.getSincePromise(req.params.timestamp)
+      .then(function (data) {
+        res.send(data);
+      });
+  }
+
 });
 
 

@@ -44,17 +44,19 @@
     fill: $humidityTransparent;
   }
 
-  .bobble-humidity {
+  .bobbel-humidity {
     display: none;
     fill: $humidityFull;
+    // fill: transparent;
   }
 
-  .bobble-temperature {
+  .bobbel-temperature {
     display: none;
     fill: $tempFull;
+    // fill: transparent;
   }
 
-  &:hover .bobble {
+  &:hover .bobbel {
     display: block;
   }
 }

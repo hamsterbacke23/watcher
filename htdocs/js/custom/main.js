@@ -6,6 +6,7 @@ $(function () {
   tsModules.Gauges.init();
   tsModules.Zoom.init();
   tsModules.Chart.init();
+  tsModules.Router.init();
 });
 
 

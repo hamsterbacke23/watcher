@@ -90,7 +90,7 @@ getMakePicturePromise()
     }
 
     var startTime = new Date().getTime();
-    return model.getAllInRange(startTime, config.pkg.dataPointTimeIntervall)
+    return model.getAllInRangePromise(startTime, config.pkg.dataPointTimeIntervall)
       .then(function (result) {
         // only create entry if no result found
         if(result && result.length) {

@@ -39,6 +39,12 @@ img.big {
   display: inline-block;
 }
 
+.emptypreview {
+  display: none;
+  height: 60vh;
+  background-color: rgba(0,0,0,0.5);
+}
+
 .time {
   position: absolute;
   color: $grayTransparent;
