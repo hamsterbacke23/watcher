@@ -80,12 +80,15 @@ tsModules.Chart = (function () {
       // Set the dimensions of the canvas / graph
       var margin = {top: 20, right: 40, bottom: 20, left: 40},
         width = 800 - margin.left - margin.right,
-        height = 270 - margin.top - margin.bottom;
+        chartHeight = 270 - margin.top - margin.bottom,
+        contextHeight = 75 - margin.top - margin.bottom,
+        contextWidth = width * 0.66,
+        containerHeight =  chartHeight + contextHeight + 2*margin.top + 2*margin.bottom;
 
       // Set the ranges
       var x = d3.time.scale().range([0, width]);
-      var y0 = d3.scale.linear().range([height, 0]);
-      var y1 = d3.scale.linear().range([height, 0]);
+      var y0 = d3.scale.linear().range([chartHeight, 0]);
+      var y1 = d3.scale.linear().range([chartHeight, 0]);
 
       // Define the axes
       var xAxis = d3.svg.axis().scale(x)
@@ -126,16 +129,24 @@ tsModules.Chart = (function () {
       svg.selectAll('svg > *').remove();
 
       svg = d3.select('#chart')
+              .attr('width', width + margin.right + margin.left)
+              .attr('height', containerHeight)
               .attr('viewBox', '0 0 '  +
                  (width + margin.left + margin.right) + ' ' +
-                 (height + margin.top + margin.bottom))
-              .attr('preserveAspectRatio', 'xMidYMid meet')
-          .append('g')
-              .attr('transform',
-                    'translate(' + margin.left + ',' + margin.top + ')');
+                 (containerHeight))
+              .attr('preserveAspectRatio', 'xMidYMid meet');
+
+      var chart = svg.append('g')
+            .attr('class', 'chart')
+            .attr('transform',
+            'translate(' + margin.left + ',' + margin.top + ')');
+
+      var context = svg.append('g')
+          .attr('class','context')
+          .attr('transform', 'translate(' + (width * 0.16666) + ',' + (chartHeight + 2*margin.top) + ')');
 
       // Scale the range of the data
-      x.domain(d3.extent(data, function(d) { return d.date; }));
+      x.domain(d3.extent(data.map(function(d) { return d.date; })));
       y0.domain([
         d3.min(data, function(d) { return d.humidity; }),
         d3.max(data, function(d) { return d.humidity; })
@@ -145,67 +156,132 @@ tsModules.Chart = (function () {
         d3.max(data, function(d) { return d.temperature; })
       ]);
 
-      svg.append('path')
+      chart.append('defs').append('clipPath')
+          .attr('id', 'clip')
+        .append('rect')
+          .attr('width', width)
+          .attr('height', chartHeight);
+
+      chart.append('path')
         .attr('class', 'chartline temperature')
+        .attr('clip-path', 'url(#clip)')
         .attr('d', valueline1(data));
 
-      svg.append('path')
+      chart.append('path')
         .attr('class', 'chartline humidity')
+        .attr('clip-path', 'url(#clip)')
         .attr('d', valueline0(data));
 
 
       // Add the X Axis
-      svg.append('g')
+      chart.append('g')
         .attr('class', 'x-axis axis')
-        .attr('transform', 'translate(0,' + height + ')')
+        .attr('transform', 'translate(0,' + chartHeight + ')')
         .call(xAxis);
 
       // Add the Z Axis
-      svg.append('g')
+      chart.append('g')
         .attr('class', 'y-axis-right y-axis axis')
         .attr('transform', 'translate(' + width + ' ,0)')
         .call(yAxisRight);
 
       // Add the Y Axis
-      svg.append('g')
+      chart.append('g')
         .attr('class', 'y-axis-left y-axis axis')
         .call(yAxisLeft);
 
       // Area
-      svg.append('path')
+      chart.append('path')
           .datum(data)
           .attr('class', 'area area-humidity')
           .attr('d', area0);
 
-      svg.append('path')
+      chart.append('path')
           .datum(data)
           .attr('class', 'area area-temperature')
           .attr('d', area1);
 
       //points
-      svg.selectAll('.' + dotClass + '.' + dotClass + '-temperature')
-           .data(data)
-         .enter().append('a')
-           .attr('class', dotClass + ' ' + dotClass + '-temperature')
-           .attr('xlink:href', function(d) {
-              return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
-            })
-             .append('circle')
-             .attr('cx', valueline1.x())
-             .attr('cy', valueline1.y())
-             .attr('r', dotRadius);
+      var dots = chart.append('g')
+        .attr('clip-path', 'url(#clip)');
 
-      svg.selectAll('.' + dotClass + '.' + dotClass + '-humidity')
-           .data(data)
-         .enter().append('a')
-           .attr('class', dotClass + ' ' + dotClass + '-humidity')
-           .attr('xlink:href', function(d) {
-              return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
-            })
-             .append('circle')
-             .attr('cx', valueline0.x())
-             .attr('cy', valueline0.y())
-             .attr('r', dotRadius);
+      // dots.selectAll('.' + dotClass + '.' + dotClass + '-temperature')
+      //      .data(data)
+      //    .enter().append('a')
+      //      .attr('class', dotClass + ' ' + dotClass + '-temperature')
+      //      .attr('xlink:href', function(d) {
+      //         return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
+      //       })
+      //        .append('circle')
+      //        .attr('cx', valueline1.x())
+      //        .attr('cy', valueline1.y())
+      //        .attr('r', dotRadius);
+
+      // dots.selectAll('.' + dotClass + '.' + dotClass + '-humidity')
+      //      .data(data)
+      //    .enter().append('a')
+      //      .attr('class', dotClass + ' ' + dotClass + '-humidity')
+      //      .attr('xlink:href', function(d) {
+      //         return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
+      //       })
+      //        .append('circle')
+      //        .attr('cx', valueline0.x())
+      //        .attr('cy', valueline0.y())
+      //        .attr('r', dotRadius);
+
+      // reset everything
+      function onBrush() {
+        chart.select('path.humidity').attr('d', valueline0(data));
+        chart.select('path.temperature').attr('d', valueline1(data));
+        chart.select('path.area-humidity').datum(data).attr('d', area0);
+        chart.select('path.area-temperature').datum(data).attr('d', area1);
+        // chart.selectAll('.' + dotClass + '-humidity circle').data(data)
+        //   .attr('cx', valueline0.x())
+        //   .attr('cy', valueline0.y());
+        // chart.selectAll('.' + dotClass + '-temperature circle').data(data)
+        //   .attr('cx', valueline1.x())
+        //   .attr('cy', valueline1.y());
+
+        x.domain(brush.empty() ? contextXScale.domain() : brush.extent());
+        chart.select('.x-axis').call(xAxis);
+
+      }
+
+      var contextXScale = d3.time.scale()
+              .range([0, contextWidth])
+              .domain(x.domain());
+
+      var contextAxis = d3.svg.axis()
+            .scale(contextXScale)
+            .tickSize(contextHeight)
+            .tickPadding(5)
+            .orient('bottom');
+
+      var contextArea = d3.svg.area()
+            .interpolate('monotone')
+            .x(function(d) { return contextXScale(d.date); })
+            .y0(contextHeight)
+            .y1(0);
+
+      var brush = d3.svg.brush()
+            .x(contextXScale)
+            .on('brush', onBrush);
+
+      context.append('g')
+          .attr('class', 'x axis top')
+          .attr('transform', 'translate(0,0)')
+          .call(contextAxis);
+
+      context.append('g')
+          .attr('class', 'x brush')
+          .call(brush)
+          .selectAll('rect')
+          .attr('y', 0)
+          .attr('height', contextHeight);
+
+
+
+
     }
   };
 })();

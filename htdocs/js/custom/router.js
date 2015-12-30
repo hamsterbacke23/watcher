@@ -2,18 +2,10 @@ var tsModules = tsModules || {};
 
 tsModules.Router = (function () {
 
-  var standardRange = 500 * 60 * 1000;
+  var standardRange = 60 * 24 * 3600 * 1000;
   var standardTime = new Date().getTime();
 
   return {
-
-    init : function () {
-      var data = this.getDataFromHashUrl();
-      var hash = location.hash.replace('#', '');
-      if(!hash) {
-        window.location = window.location + '#' + data.startTime + '/' + data.rangeTime;
-      }
-    },
 
     getDataFromHashUrl : function() {
       var hash = location.hash.replace('#', '');

@@ -3,10 +3,17 @@ var express = require('express'),
      model = require('./model');
 
 app.get('/api/one/:timestamp/:range?', function (req, res) {
-  model.getSinglePromise(req.params.timestamp)
-    .then(function (data) {
-      res.send(data);
-    });
+  if(req.params.timestamp === 'latest') {
+    model.getLatestEntryPromise(req.params.timestamp)
+      .then(function (data) {
+        res.send(data);
+      });
+  } else {
+    model.getSinglePromise(req.params.timestamp)
+      .then(function (data) {
+        res.send(data);
+      });
+  }
 });
 
 app.get('/api/:timestamp/:range?', function (req, res) {

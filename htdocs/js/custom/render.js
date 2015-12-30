@@ -31,17 +31,21 @@ tsModules.Render = (function () {
         success : function (data) {
           var latest = data[data.length - 1];
 
-          if(latest && latest.images && latest.images.medium && latest.images.big) {
-            $('img.preview').show();
-            $('.emptypreview').css('display','');
-            $('img.preview').attr('src', latest.images.medium);
-            $('img.big').attr('src', latest.images.big);
-          } else {
-            $('img.preview').hide();
-            $('.emptypreview').css('display','block');
-
-            return;
+          // crappy fallback when no images are available
+          $('img.preview').attr('style', '');
+          if(!latest || !latest.images || !latest.images.medium || !latest.images.big) {
+            latest = latest ? latest : {};
+            latest.images = {};
+            latest.images.medium = latest.images.big = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+            $('img.preview').css({
+              width: '100%',
+              height: '40vh'
+            });
           }
+
+          $('img.preview').attr('src', latest.images.medium);
+          $('img.big').attr('src', latest.images.big);
+
           tsModules.Zoom.init();
 
           // get time
