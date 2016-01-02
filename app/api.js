@@ -16,6 +16,15 @@ app.get('/api/one/:timestamp/:range?', function (req, res) {
   }
 });
 
+app.get('/api/minmax/:timestampStart/:timestampEnd', function (req, res) {
+  model.getMinMaxPromise(req.params.timestampStart, req.params.timestampEnd)
+    .then(function (data) {
+      res.send(data);
+    });
+
+});
+
+
 app.get('/api/:timestamp/:range?', function (req, res) {
   if(req.params.range) {
     model.getAllInRangePromise(req.params.timestamp, req.params.range)

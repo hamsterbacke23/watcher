@@ -1,5 +1,4 @@
 .mainchart {
-  // padding: 20px;
   box-sizing: border-box;
   fill: $gray;
 
@@ -51,16 +50,35 @@
   .bobbel-humidity {
     display: none;
     fill: $humidityFull;
-    // fill: transparent;
   }
 
   .bobbel-temperature {
     display: none;
     fill: $tempFull;
-    // fill: transparent;
   }
 
-  &:hover .bobbel {
+  .bobbel circle {
+    r: 3;
+  }
+
+  .bobbel.hasimages circle {
+    r: 5;
+  }
+
+  .hidedots .bobbel {
+    display: none;
+  }
+
+  .showdots .bobbel {
     display: block;
+  }
+
+  .context {
+    fill : $grayTransparent;
+    font-size: 9px;
+  }
+
+  .context-bg {
+    fill : $grayTransparent;
   }
 }

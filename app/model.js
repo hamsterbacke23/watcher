@@ -56,14 +56,15 @@ function getQueryRangePromise(start, end) {
  * @param  int rangeTime in microseconds
  * @return {promise} promise
  */
-function getAllInRangePromise(time, rangeTime) {
-  time = +time;
-  rangeTime = +rangeTime;
-  var start = time ? time : new Date().getTime();
-  start = start - rangeTime;
-  var end = time ? time : new Date().getTime();
-  end = end + rangeTime;
-  return getQueryRangePromise(start, end);
+function getAllInRangePromise(toTime, timeRange) {
+  toTime = +toTime;
+  timeRange = +timeRange;
+  var startDate = toTime ? toTime : new Date().getTime();
+  startDate = startDate - timeRange;
+
+  var endDate = toTime ? toTime : new Date().getTime();
+
+  return getQueryRangePromise(startDate, endDate);
 }
 
 function getLatestEntryPromise() {
@@ -98,6 +99,79 @@ function getSinglePromise(timestamp) {
     return deferred.promise;
 }
 
+function getMinMaxPromise(toTime, endTime) {
+  var deferred = Q.defer();
+  var maxTemp, minTemp, maxHumid, minHumid, endDate, startDate;
+
+  startDate = toTime ? toTime : new Date().getTime();
+  endDate = endTime ? endTime : new Date().getTime();
+
+  DataPoint.findOne({
+    timestamp : {
+      '$gte': startDate,
+      '$lte': endDate
+    }
+  })
+  .where({'temperature' : { '$exists' : true }})
+  .sort({'temperature' : -1})
+  .exec()
+    .then(function(doc) {
+      maxTemp = doc;
+    })
+    .then(function () {
+      return DataPoint.findOne({
+        timestamp : {
+          '$gte': startDate,
+          '$lte': endDate
+        }
+      })
+      .where({'temperature' : { '$exists' : true }})
+      .sort({'temperature' : 1})
+      .exec();
+    })
+    .then(function(doc) {
+      minTemp = doc;
+    })
+    .then(function () {
+      return DataPoint.findOne({
+        timestamp : {
+          '$gte': startDate,
+          '$lte': endDate
+        }
+      })
+      .where({'humidity' : { '$exists' : true }})
+      .sort({'humidity' : 1})
+      .exec();
+    })
+    .then(function(doc) {
+      minHumid = doc;
+    })
+    .then(function () {
+      return DataPoint.findOne({
+        timestamp : {
+          '$gte': startDate,
+          '$lte': endDate
+        }
+      })
+      .where({'humidity' : { '$exists' : true }})
+      .sort({'humidity' : -1})
+      .exec();
+    })
+    .then(function(doc) {
+      maxHumid = doc;
+    })
+    .then(function() {
+      deferred.resolve({
+        maxTemp: maxTemp,
+        minTemp: minTemp,
+        minHumid: minHumid,
+        maxHumid: maxHumid
+      });
+    });
+
+  return deferred.promise;
+}
+
 
 function getSincePromise(sinceTimestamp) {
   var deferred = Q.defer();
@@ -115,24 +189,11 @@ function getSincePromise(sinceTimestamp) {
       deferred.resolve(data);
     });
 
-    return deferred.promise;
-}
-
-/**
- * @param  {int}
- * @return {promise}
- */
-function parseDayRangeFromTimestamp(timestamp) {
-
-  var start = new Date(timestamp);
-  start.setHours(0,0,0,0).getTime();
-  var end = new Date(timestamp);
-  end.setHours(23,59,59,999).getTime();
-
-  return getQueryRangePromise(start, end);
+  return deferred.promise;
 }
 
 
+module.exports.getMinMaxPromise = getMinMaxPromise;
 module.exports.getCreatePromise = getCreatePromise;
 module.exports.getAllInRangePromise = getAllInRangePromise;
 module.exports.getSinglePromise = getSinglePromise;

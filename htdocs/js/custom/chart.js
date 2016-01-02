@@ -3,25 +3,16 @@ var tsModules = tsModules || {};
 tsModules.Chart = (function () {
 
   var endpoint = '/api/';
+  var minmaxEndpoint = '/api/minmax/';
   var dotClass = 'bobbel';
   var rangeSelectSel = '[name="selectDayRange"]';
   var chartContainerSel = '.mainchart';
-  var dotRadius = 2.5;
+  var dateFormat = '%d-%b %Hh';
 
   return {
 
     init: function () {
-      this.initRangeSelect();
-      this.setHashChangeListener();
-    },
-
-    setHashChangeListener : function () {
-      var self = this;
-      window.addEventListener('hashchange', function () {
-        self.setChart();
-        self.updateRangeSelect();
-      }, false);
-      self.setChart();
+      this.setChart();
     },
 
     setChart: function (startTime, rangeTime) {
@@ -42,31 +33,33 @@ tsModules.Chart = (function () {
       });
     },
 
-    updateRangeSelect : function () {
-      var $select = $(rangeSelectSel);
-      var data = tsModules.Router.getDataFromHashUrl();
-      if(data.rangeTime) {
-        var days =  Math.ceil(data.rangeTime / (1000 * 3600 * 24));
-        $select.val(days);
+    getMinMaxData : function(dates) {
+      if(!dates.length) {
+        return;
       }
-    },
-
-    setRangeSelectData : function ($el) {
-      var days = Math.abs(parseInt($el.val(), 10));
-
-      var now = new Date();
-      tsModules.Router.setNewHashUrl(now.getTime(), 24 * 3600 * 1000 * days);
-    },
-
-    initRangeSelect: function () {
       var self = this;
-      var $select = $(rangeSelectSel);
-
-      $select.on('change', function () {
-        var $this = $(this);
-        self.setRangeSelectData($this);
+      var minmaxEndpoint = '/api/minmax/';
+      var apiurl = minmaxEndpoint + dates[0].getTime() + '/' + dates[1].getTime();
+      $.ajax({
+        url : apiurl,
+        dataType : 'json',
+        cache : false,
+        success : function (data) {
+          if(!data) {
+            return;
+          }
+          self.displayMinMax(data);
+        }
       });
+    },
 
+    displayMinMax : function (data) {
+      $('.minHumid .value').text((Math.round(data.minHumid.humidity * 10) / 10));
+      $('.maxHumid .value').text((Math.round(data.maxHumid.humidity * 10) / 10));
+      $('.diffHumid .value').text(Math.round(Math.abs(data.maxHumid.humidity - data.minHumid.humidity) * 10) / 10);
+      $('.minTemp .value').text((Math.round(data.minTemp.temperature * 10) / 10));
+      $('.maxTemp .value').text((Math.round(data.maxTemp.temperature * 10) / 10));
+      $('.diffTemp .value').text(Math.round(Math.abs(data.maxTemp.temperature - data.minTemp.temperature) * 10) / 10);
     },
 
     createChart: function (data, startTime) {
@@ -76,6 +69,7 @@ tsModules.Chart = (function () {
         d.date = d.timestamp ? new Date(d.timestamp) : null;
         d.humidity =  d.humidity ? +d.humidity : null;
         d.temperature = d.temperature ? +d.temperature : null;
+        d.hasImages = d.images;
       });
       // Set the dimensions of the canvas / graph
       var margin = {top: 20, right: 40, bottom: 20, left: 40},
@@ -85,6 +79,8 @@ tsModules.Chart = (function () {
         contextWidth = width * 0.66,
         containerHeight =  chartHeight + contextHeight + 2*margin.top + 2*margin.bottom;
 
+      var defaultExtent = [[100, 100], [300, 300]];
+
       // Set the ranges
       var x = d3.time.scale().range([0, width]);
       var y0 = d3.scale.linear().range([chartHeight, 0]);
@@ -93,7 +89,7 @@ tsModules.Chart = (function () {
       // Define the axes
       var xAxis = d3.svg.axis().scale(x)
         .orient('bottom').ticks(5)
-        .tickFormat(d3.time.format('%d-%b %Hh'));
+        .tickFormat(d3.time.format(dateFormat));
 
       var yAxisRight = d3.svg.axis().scale(y0)
         .orient('right').ticks(5);
@@ -129,8 +125,6 @@ tsModules.Chart = (function () {
       svg.selectAll('svg > *').remove();
 
       svg = d3.select('#chart')
-              .attr('width', width + margin.right + margin.left)
-              .attr('height', containerHeight)
               .attr('viewBox', '0 0 '  +
                  (width + margin.left + margin.right) + ' ' +
                  (containerHeight))
@@ -143,7 +137,12 @@ tsModules.Chart = (function () {
 
       var context = svg.append('g')
           .attr('class','context')
-          .attr('transform', 'translate(' + (width * 0.16666) + ',' + (chartHeight + 2*margin.top) + ')');
+          .attr('transform', 'translate(' + (width * 0.16666 + margin.left) + ',' + (chartHeight + 3*margin.top) + ')');
+
+      context.append('rect')
+        .attr('width', contextWidth)
+        .attr('height', contextHeight)
+        .attr('class', 'context-bg');
 
       // Scale the range of the data
       x.domain(d3.extent(data.map(function(d) { return d.date; })));
@@ -203,48 +202,71 @@ tsModules.Chart = (function () {
 
       //points
       var dots = chart.append('g')
+        .attr('class', 'dotgraph hidedots')
         .attr('clip-path', 'url(#clip)');
 
-      // dots.selectAll('.' + dotClass + '.' + dotClass + '-temperature')
-      //      .data(data)
-      //    .enter().append('a')
-      //      .attr('class', dotClass + ' ' + dotClass + '-temperature')
-      //      .attr('xlink:href', function(d) {
-      //         return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
-      //       })
-      //        .append('circle')
-      //        .attr('cx', valueline1.x())
-      //        .attr('cy', valueline1.y())
-      //        .attr('r', dotRadius);
+      dots.selectAll('.' + dotClass + '.' + dotClass + '-temperature')
+           .data(data)
+         .enter().append('a')
+           .attr('class', function(d) {
+              var dClass = dotClass + ' ' + dotClass + '-temperature';
+              dClass += d.hasImages ? ' hasimages' : '';
+              return dClass;
+            })
+           .attr('xlink:href', function(d) {
+              return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
+            })
+             .append('circle')
+             .attr('cx', valueline1.x())
+             .attr('cy', valueline1.y());
 
-      // dots.selectAll('.' + dotClass + '.' + dotClass + '-humidity')
-      //      .data(data)
-      //    .enter().append('a')
-      //      .attr('class', dotClass + ' ' + dotClass + '-humidity')
-      //      .attr('xlink:href', function(d) {
-      //         return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
-      //       })
-      //        .append('circle')
-      //        .attr('cx', valueline0.x())
-      //        .attr('cy', valueline0.y())
-      //        .attr('r', dotRadius);
+      dots.selectAll('.' + dotClass + '.' + dotClass + '-humidity')
+           .data(data)
+         .enter().append('a')
+           .attr('class', function(d) {
+              var dClass = dotClass + ' ' + dotClass + '-humidity';
+              dClass += d.hasImages ? ' hasimages' : '';
+              return dClass;
+            })
+           .attr('xlink:href', function(d) {
+              return tsModules.Router.setNewHashUrl(d.timestamp, false, true);
+            })
+             .append('circle')
+             .attr('cx', valueline0.x())
+             .attr('cy', valueline0.y());
 
-      // reset everything
+
+      var self = this;
+
       function onBrush() {
+
         chart.select('path.humidity').attr('d', valueline0(data));
         chart.select('path.temperature').attr('d', valueline1(data));
         chart.select('path.area-humidity').datum(data).attr('d', area0);
         chart.select('path.area-temperature').datum(data).attr('d', area1);
-        // chart.selectAll('.' + dotClass + '-humidity circle').data(data)
-        //   .attr('cx', valueline0.x())
-        //   .attr('cy', valueline0.y());
-        // chart.selectAll('.' + dotClass + '-temperature circle').data(data)
-        //   .attr('cx', valueline1.x())
-        //   .attr('cy', valueline1.y());
+        chart.selectAll('.' + dotClass + '-humidity circle').data(data)
+          .attr('cx', valueline0.x())
+          .attr('cy', valueline0.y());
+        chart.selectAll('.' + dotClass + '-temperature circle').data(data)
+          .attr('cx', valueline1.x())
+          .attr('cy', valueline1.y());
 
-        x.domain(brush.empty() ? contextXScale.domain() : brush.extent());
+        var b = brush.empty() ? contextXScale.domain() : brush.extent();
+        self.getMinMaxData(b);
+
+        var rangeGreaterThanOneDay = (Math.abs(b[0].getTime() - b[1].getTime())) < 24 * 3600 * 1000;
+        var dotsClass = rangeGreaterThanOneDay ? 'showdots' : 'hidedots';
+        x.domain(b);
         chart.select('.x-axis').call(xAxis);
 
+        d3.select('.dotgraph')
+          .attr('class', 'dotgraph ' + dotsClass);
+
+      }
+
+      function onBrushEnded () {
+        console.log('onBrushEnded');
+        d3.select('.chartline').transition().duration(1000);
       }
 
       var contextXScale = d3.time.scale()
@@ -257,20 +279,23 @@ tsModules.Chart = (function () {
             .tickPadding(5)
             .orient('bottom');
 
+
       var contextArea = d3.svg.area()
             .interpolate('monotone')
             .x(function(d) { return contextXScale(d.date); })
             .y0(contextHeight)
             .y1(0);
 
-      var brush = d3.svg.brush()
-            .x(contextXScale)
-            .on('brush', onBrush);
-
       context.append('g')
           .attr('class', 'x axis top')
           .attr('transform', 'translate(0,0)')
           .call(contextAxis);
+
+      var brush = d3.svg.brush()
+            .x(contextXScale)
+            .on('brush', onBrush)
+            .on('brushend', onBrushEnded);
+
 
       context.append('g')
           .attr('class', 'x brush')
@@ -279,6 +304,15 @@ tsModules.Chart = (function () {
           .attr('y', 0)
           .attr('height', contextHeight);
 
+      var parseFormat = d3.time.format(dateFormat);
+      var latestDate = data[data.length - 1].date;
+      var yesterDate = new Date(latestDate.getTime() - 18 * 3600 * 1000);
+
+      window.setTimeout(function () {
+        brush.extent([yesterDate, latestDate]);
+        brush(d3.select('.brush').transition());
+        brush.event(d3.select('.brush').transition());
+      }, 100);
 
 
 

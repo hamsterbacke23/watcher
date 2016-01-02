@@ -18,6 +18,16 @@ tsModules.Render = (function () {
       $('.container').append($('<div class="emptypreview"></div>'));
     },
 
+    checkToLocaleStringSupportsLocales : function () {
+      var number = 0;
+      try {
+        number.toLocaleString('i');
+      } catch (e) {
+        return e.name === 'RangeError';
+      }
+      return false;
+    },
+
     getData: function (startTime, rangeTime) {
       var self = this;
 
@@ -43,7 +53,7 @@ tsModules.Render = (function () {
             });
           }
 
-          $('img.preview').attr('src', latest.images.medium);
+          $('img.preview').attr('srcset', latest.images.small + ' 640w,' + latest.images.medium + ' 1280w,' + latest.images.big + ' 1980w');
           $('img.big').attr('src', latest.images.big);
 
           tsModules.Zoom.init();
@@ -51,7 +61,11 @@ tsModules.Render = (function () {
           // get time
           var date = new Date(latest.timestamp);
           var locale = 'en-us';
-          var month = date.toLocaleString(locale, { month: 'short'});
+          if(self.checkToLocaleStringSupportsLocales()) {
+            var month = date.toLocaleString(locale, { month: 'short'});
+          } else {
+            var month = date.getMonths();
+          }
           var day =  date.toLocaleString(locale, { day: 'numeric'});
           var hours = date.getHours();
           var minutes = '0' + date.getMinutes();
