@@ -6,26 +6,28 @@ tsModules.PageRefresher = (function () {
 
     init: function () {
       document.addEventListener('webkitvisibilitychange', function(evt) {
-        var isVisible = !this['hidden'];
+        var isVisible = !this.hidden;
         if (isVisible) {
           window.location.reload(true);
         }
       });
 
       var time = new Date().getTime();
-      $(document.body).bind("mousemove keypress", function(e) {
+      $(document.body).bind('mousemove keypress', function(e) {
           time = new Date().getTime();
       });
 
       function refresh() {
-          if(new Date().getTime() - time >= (60000 * 30))
+          if(new Date().getTime() - time >= (60000 * 30)) {
               window.location.reload(true);
-          else
+              $('select').change();
+          } else {
               setTimeout(refresh, 10000);
+          }
       }
 
       setTimeout(refresh, 10000);
     }
-  }
+  };
 
 })();

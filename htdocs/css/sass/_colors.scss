@@ -1,5 +1,23 @@
 $almostWhite: #ececec;
 $gray: #d3d3d3;
-$grayTransparent: rgba(200,200,200,0.8);
+$grayTransparent: rgba(200,200,200,0.7);
 $darkgray : #747474;
+$middlegray : #4c4c4c;
+$verydarkgray : #222222;
 $turquoise: #23D37E;
+
+
+// chart
+$tempTransparent: rgba(144, 37, 78, 0.2);
+$tempFull: rgba(144, 37, 78, 1);
+
+$humidityTransparent: rgba(27, 84, 152, 0.2);
+$humidityFull: rgba(27, 84, 152, 1);
+
+
+// Gauges
+$tempGaugeBg: $grayTransparent;
+$tempGaugeMeter: $almostWhite;
+
+$humidityGaugeBg: $grayTransparent;
+$humidityGaugeMeter: $almostWhite;

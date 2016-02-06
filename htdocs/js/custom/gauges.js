@@ -6,23 +6,50 @@ tsModules.Gauges = (function () {
     var tempSelector = '.temperature .meta';
     var humidSelector = '.humidity .meta';
     var maxTemp = 25;
-    var minTemp = 19;
-    var maxHumid = 50;
+    var minTemp = 18;
+    var maxHumid = 65;
     var minHumid = 25;
     var tempDelta = maxTemp - minTemp;
     var humidDelta = maxHumid - minHumid;
-    var metaEndpoint = '/meta.json';
+    var endpoint = '/api/one/';
 
     return {
-      init: function () {
+
+      setHashChangeListener : function () {
         var self = this;
+
+        window.addEventListener('hashchange', function () {
+          self.initGauges();
+        }, false);
+
+        self.initGauges();
+      },
+
+      init: function () {
+        this.setHashChangeListener();
+      },
+
+      initGauges: function () {
+        var self = this;
+        var data = tsModules.Router.getDataFromHashUrl();
+
+        var apiurl = endpoint + data.startTime + '/' + data.rangeTime;
+
         $.ajax({
-          url : metaEndpoint,
+          url : apiurl,
           dataType : 'json',
           cache : false,
           success : function (data) {
-            $(tempSelector).html(data.temperature);
-            $(humidSelector).html(data.humidity);
+            var latest = data[data.length - 1];
+            if(!latest) {
+              return;
+            }
+            if(latest.temperature) {
+              $(tempSelector).html(latest.temperature);
+            }
+            if(latest.humidity) {
+              $(humidSelector).html(latest.humidity);
+            }
             self.setGauges();
           }
         });
@@ -46,15 +73,16 @@ tsModules.Gauges = (function () {
           var $meter = $this.find('.meter');
           var $wrapper = $this.closest(wrapperSelector);
           var $meta = $wrapper.find('.meta');
+          var degrees, temperature, humidity;
 
           if ($wrapper.hasClass('temperature')) {
-            var temperature = parseFloat($meta.text(), 10);
-            var degrees = self.calcDegrees(temperature, minTemp, tempDelta);
+            temperature = parseFloat($meta.text(), 10);
+            degrees = self.calcDegrees(temperature, minTemp, tempDelta);
           }
 
           if ($wrapper.hasClass('humidity')) {
-            var humidity = parseFloat($meta.text(), 10);
-            var degrees = self.calcDegrees(humidity, minHumid, humidDelta);
+            humidity = parseFloat($meta.text(), 10);
+            degrees = self.calcDegrees(humidity, minHumid, humidDelta);
           }
 
           $meter.css({

@@ -20,7 +20,7 @@ http.createServer(function(request, response) {
       return;
     }
 
-    if (fs.statSync(filename).isDirectory()) filename += '/index.html';
+    // if (fs.statSync(filename).isDirectory()) filename += '/beta.html';
 
     fs.readFile(filename, 'binary', function(err, file) {
       if(err) {

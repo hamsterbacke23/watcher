@@ -1,0 +1,84 @@
+.mainchart {
+  box-sizing: border-box;
+  fill: $gray;
+
+  .area {
+    clip-path: url(#clip);
+  }
+
+  .selectrange {
+    float: right;
+  }
+
+  path.chartline {
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+  }
+
+  path.humidity {
+    stroke: $humidityFull;
+  }
+
+  path.temperature {
+    stroke: $tempFull;
+  }
+
+  .axis path,
+  .axis line {
+      fill: none;
+      stroke: grey;
+      stroke-width: 2;
+      shape-rendering: crispEdges;
+  }
+
+  .y-axis-left {
+    fill: $tempFull;
+  }
+
+  .y-axis-right {
+    fill: $humidityFull;
+  }
+
+  .area-temperature {
+    fill: $tempTransparent;
+  }
+  .area-humidity {
+    fill: $humidityTransparent;
+  }
+
+  .bobbel-humidity {
+    display: none;
+    fill: $humidityFull;
+  }
+
+  .bobbel-temperature {
+    display: none;
+    fill: $tempFull;
+  }
+
+  .bobbel circle {
+    r: 3;
+  }
+
+  .bobbel.hasimages circle {
+    r: 5;
+  }
+
+  .hidedots .bobbel {
+    display: none;
+  }
+
+  .showdots .bobbel {
+    display: block;
+  }
+
+  .context {
+    fill : $grayTransparent;
+    font-size: 9px;
+  }
+
+  .context-bg {
+    fill : $grayTransparent;
+  }
+}

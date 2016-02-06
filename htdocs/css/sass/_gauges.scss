@@ -40,11 +40,32 @@ $gaugeWidth: 30px;
   }
 }
 
+// overwrite colors
+.humidity .gauge  {
+  > .meter,
+  &::before {
+    background-color: $humidityGaugeBg;
+  }
+  > .meter {
+    background-color: $humidityGaugeMeter;
+  }
+}
+
+.temperature .gauge  {
+  > .meter,
+  &::before {
+    background-color: $tempGaugeBg;
+  }
+  > .meter {
+    background-color: $tempGaugeMeter;
+  }
+}
+
 .gaugewrapper {
   position: relative;
   margin-bottom: 25px;
   margin-right: 14px;
-  width: 140px;
+  width: 140px; // just a guess
   float: right;
 
   .meta {

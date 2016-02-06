@@ -1,83 +1,125 @@
-var pjson = require('../package.json');
-var fs = require('fs');
-var path = require('path');
-var lwip = require('lwip');
-var async = require('async');
+var fs = require('fs'),
+  path = require('path'),
+  lwip = require('lwip'),
+  config = require('./config'),
+  async = require('async');
 
 var incomingFolder = '/new';
-var absOutputPath = path.resolve(__dirname + '/../' + pjson.publicPath + '/' + pjson.imageoutPathrel);
+var absOutputPath = config.paths.imagesOutPath;
+var publicOutputPath = config.paths.imagesOutPublicPath;
 
-// Resize function
-function resizeImages (images, size, x, y, alldone) {
 
-  async.eachSeries(images, function(image, cb) {
-    if(size === 'big' || image.substring(0,2) === '._' || !x || !y) {
-      cb();
-      return;
-    }
-    var inputPath = absOutputPath + incomingFolder + '/' + image;
-    var outputPath = absOutputPath + '/' + size + '/' + image;
+/**
+ * Resizes a single image
+ */
+function resizeImage (image, size, x, y, recordResizeCb, resizeDoneCb) {
 
-    console.log('in', inputPath);
-    console.log(' => out', outputPath);
+  var singleItem = {};
 
-    fs.readFile(inputPath, function(err, buffer) {
-      lwip.open(buffer, 'jpg', function(err, img){
-        if(err) {
-          console.log(err);
-          return;
-        }
+  if(image.substring(0,2) === '._' || !x || !y) {
+    resizeDoneCb();
+    return;
+  }
+  var inputPath = absOutputPath + incomingFolder + '/' + image;
+  var outputPath = absOutputPath + '/' + size + '/' + image;
 
-        img.batch()
-          .resize(x,y)
-          .writeFile(outputPath, function(err){
-             cb();
-          });
-      });
+  console.log('in', inputPath);
+  console.log(' => out', outputPath);
+  singleItem.key = size;
+  singleItem.path = publicOutputPath + '/' + size + '/' + image;
+
+  fs.readFile(inputPath, function(err, buffer) {
+    lwip.open(buffer, 'jpg', function(err, img){
+      if(err) {
+        throw err;
+      }
+
+      img.batch()
+        .resize(x,y)
+        .writeFile(outputPath, function(err){
+           recordResizeCb(singleItem);
+           resizeDoneCb();
+           return;
+        });
     });
-  }, alldone);
+  });
 
 }
 
+/**
+ * Main function
+ * @param  callback
+ */
 function go (cb) {
+
   var files = fs.readdirSync(absOutputPath + incomingFolder);
   var images = [];
+  var timestamp;
 
   for (var i = 0; i < files.length; i++) {
     if(path.extname(files[i]) === '.jpg' || path.extname(files[i]) === '.jpeg') {
         images.push(files[i]);
     }
-  };
-
-  if(images.length == 0) {
-    console.log('No new images');
+  }
+  if(!images.length) {
+    cb();
     return;
   }
 
-  async.each(pjson.resizeSizes, function(size, cb) {
-      var x = size.x;
-      var y = size.y;
-      var sizeKey = size.key;
-      resizeImages(images, sizeKey, x, y, cb);
-    },
-    function(err) {
+  /**
+   * Callback for after we are done
+   * with all images and all sizes
+   */
+  var resultImagesInfo = [];
+  var done = function (err) {
+    if(err) {
+      throw err;
+    }
+    // delete originals
+    async.each(images, function(image, itemcb) {
+      fs.unlink(
+        absOutputPath + incomingFolder + '/' + image,
+        itemcb
+      );
+    }, function (err) {
       if(err) {
-        console.log(err);
-        return;
+        throw err;
       }
-      // move originals
-      var prefix = 'big';
-      async.each(images, function(image) {
-        fs.rename(
-          absOutputPath + incomingFolder + '/' + image,
-          absOutputPath + '/' + prefix + '/' + image
-        );
-      });
+      cb(resultImagesInfo);
+      return;
     });
+  };
+
+  var resizedImageInfo = {};
+  var recordResizeCb = function (item) {
+    resizedImageInfo[item.key] = item.path;
+  };
+
+  async.each(images, function(image, imgCb) {
+    timestamp = fs.statSync(absOutputPath + incomingFolder + '/' + image).mtime.getTime();
+
+    async.each(config.pkg.resizeSizes, function(size, itemCb) {
+        var x = size.x;
+        var y = size.y;
+        var sizeKey = size.key;
+        resizeImage(image, sizeKey, x, y, recordResizeCb, itemCb);
+      }, function (err) {
+        // pack one image info into the array an reset
+        resultImagesInfo.push({
+          images : resizedImageInfo,
+          timestamp : timestamp
+        });
+        resizedImageInfo = {};
+
+        // we are done with this image
+        imgCb();
+      });
+
+  }, done);
+
 }
 
-go();
-
+module.exports.go = go;
 
 
 

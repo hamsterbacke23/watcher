@@ -2,35 +2,42 @@
   "name": "watcher",
   "version": "0.0.1",
   "description": "still image watcher",
-  "main": "htdocs/index.html",
-  "publicPath": "/htdocs",
-  "imageoutPathrel": "images/output",
   "dependencies": {
     "async": "^1.5.0",
+    "express": "^4.13.3",
     "gulp": "^3.9.0",
     "http": "0.0.0",
-    "lwip": "0.0.8"
+    "lwip": "0.0.8",
+    "mongoose": "^4.3.3",
+    "python-shell": "^0.3.0",
+    "q": "^1.4.1"
   },
-  "resizeSizes" : [
-    {
-      "key" : "small",
-      "x" : 640,
-      "y" : 360,
-      "removeAfterDays" : 200
-    },
-    {
-      "key" : "medium",
-      "x" : 1280,
-      "y" : 720,
-      "removeAfterDays" : 200
-    },
-    {
-      "key" : "big",
-      "x" : 1980,
-      "y" : 1080,
-      "removeAfterDays" : 30
-    }
-  ],
+  "watcher" : {
+    "publicPath": "/htdocs",
+    "imageoutPathrel": "/images/output",
+    "sensorType": 2302,
+    "sensorGpio": 4,
+    "startPhotoTime" : "21:10",
+    "endPhotoTime" : "9:05",
+    "dataPointTimeIntervall": 1000000,
+    "resizeSizes": [
+      {
+        "key": "small",
+        "x": 640,
+        "y": 360
+      },
+      {
+        "key": "medium",
+        "x": 1280,
+        "y": 720
+      },
+      {
+        "key": "big",
+        "x": 1980,
+        "y": 1080
+      }
+    ]
+  },
   "devDependencies": {
     "del": "^2.1.0",
     "gulp-autoprefixer": "^3.1.0",
