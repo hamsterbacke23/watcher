@@ -5,8 +5,6 @@ tsModules.Chart = (function () {
   var endpoint = '/api/';
   var minmaxEndpoint = '/api/minmax/';
   var dotClass = 'bobbel';
-  var rangeSelectSel = '[name="selectDayRange"]';
-  var chartContainerSel = '.mainchart';
   var dateFormat = '%d-%b %Hh';
 
   return {
